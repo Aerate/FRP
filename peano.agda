@@ -62,6 +62,9 @@ natrec : {C : Set} → C → (ℕ → C → C) → ℕ → C
 natrec base stepf zero = base
 natrec base stepf (succ args) = stepf args (natrec base stepf args)
 
+natind : {P : ℕ → Set} → P zero → ((n : ℕ) → P n → P (succ n)) → (k : ℕ) → P k
+natind = {!!}
+
 plus : ℕ → ℕ → ℕ
 plus m n = natrec m (λ x y →  succ y) n
 
