@@ -1,0 +1,18 @@
+data ℕ : Set where
+  zero : ℕ
+  succ : ℕ → ℕ
+
+--if_then_else_ : ∀ { a } → Bool → a → a → a 
+
+_+_ : ℕ → ℕ → ℕ
+zero + zero = zero
+zero + n = n
+(succ n) + m = succ (n + m)
+
+data _even : ℕ → Set where
+  ZERO : zero even
+  STEP : ∀ x → x even → succ (succ x) even
+
+pr₁ : succ ( succ (succ (succ (succ (succ zero))))) even
+--pr₁ = STEP (succ (succ zero)) (STEP zero ZERO)
+pr₁ = STEP {!!} {!!}
