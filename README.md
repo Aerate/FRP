@@ -1,3 +1,3 @@
 # FRP
-Dabbling with Agda and eventually proving correctness of some FRP.
+Dabbling with Agda and <strike>eventually proving correctness of</strike> some FRP.
 Work in Progress.
