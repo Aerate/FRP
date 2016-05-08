@@ -20,9 +20,8 @@ take : {A : Set} → (n : ℕ) → Stream A → Vector A n
 take zero _ = []
 take (suc n) (a ◂ bs) = a ∷ (take n bs)
 
-lem1 : {A : Set} → (s : Stream A) → s ≡ (headS s ◂ tailS s)
+lem1 : {A : Set} → (s : Stream A) → (headS s ◂ tailS s) ≡ s
 lem1 (a ◂ as) = refl
-
 
 -- ⁻\°-o/⁻
 {-# NON_TERMINATING #-}
@@ -30,5 +29,12 @@ lem1 (a ◂ as) = refl
 strℕ : Stream ℕ
 strℕ = 0 ◂ mapS suc strℕ 
 
---streamEq : {A : Set} → {s1 s2 : Stream A} → (headS s1 ≡ headS s2) → (tailS s1 ≡ tailS s2) → (s1 ≡ s2)
---streamEq {s1} {s2} eqH eqT = {refl\
+--data _eq_ {A} : Stream A → Stream A → Set where
+--  _◂_ : ∀ {a b as bs} (a ≡ b) (as ≡ bs) → a ◂ as eq b ◂ bs
+   
+streamEq : {A : Set} → {s1 s2 : Stream A} → (headS s1 ≡ headS s2) → (tailS s1 ≡ tailS s2) → (s1 ≡ s2)
+--streamEq {A} {(a ◂ as)} {(b ◂ bs)} h t = lem1 (streamEq t)
+streamEq h t = {!!}
+
+-- with (a ≡ b → Set) 
+--... | refl = streamEq t
