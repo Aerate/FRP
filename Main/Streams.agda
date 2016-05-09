@@ -1,43 +1,56 @@
 module Streams where
 
 open import Data.Nat
-open import VectorTypes
+open import VectorTypes using (Vector; _∷_; [])
 open import Equality
 
 data Stream (A : Set) : Set where
   _◂_ : A → Stream A → Stream A   
 
-mapS : {A B : Set} → (f : A → B) → Stream A → Stream B 
-mapS f (x ◂ xs) = f x ◂ (mapS f xs)
+map : {A B : Set} → (f : A → B) → Stream A → Stream B 
+map f (x ◂ xs) = f x ◂ (map f xs)
 
-headS : {A : Set} → Stream A → A
-headS (x ◂ _) = x
+head : {A : Set} → Stream A → A
+head (x ◂ _) = x
 
-tailS : {A : Set} → Stream A → Stream A
-tailS (_ ◂ xs) = xs
+tail : {A : Set} → Stream A → Stream A
+tail (_ ◂ xs) = xs
 
 take : {A : Set} → (n : ℕ) → Stream A → Vector A n
 take zero _ = []
 take (suc n) (x ◂ xs) = x ∷ (take n xs)
 
-lem1 : {A : Set} → (s : Stream A) → s ≡ (headS s ◂ tailS s)
-lem1 (x ◂ xs) = refl
+lemma1 : {A : Set} → (s : Stream A) → s ≡ (head s ◂ tail s)
+lemma1 (x ◂ xs) = refl
+
+lemma1-1 : {A : Set} → {x y : A} → {xs ys : Stream A} → (x ≡ y) → (xs ≡ ys) → (x ◂ xs) ≡ (y ◂ ys)
+lemma1-1 refl refl = refl
+
+streamEq : {A : Set} → {s1 s2 : Stream A} → (head s1 ≡ head s2) → (tail s1 ≡ tail s2) → (s1 ≡ s2)
+streamEq {_} {(a ◂ as)} {(b ◂ bs)} h t = lemma1-1 h t
+
+streamEq' : {A : Set} → {s1 s2 : Stream A} → (head s1 ≡ head s2) → (tail s1 ≡ tail s2) → (s1 ≡ s2)
+streamEq' {_} {s1} {s2} h t = {!!}
 
 {-# NON_TERMINATING #-}
 
 strℕ : Stream ℕ
-strℕ = 0 ◂ mapS suc strℕ 
+strℕ = 0 ◂ map suc strℕ 
+
+{-# NON_TERMINATING #-}
+
+strℕ₁ : Stream ℕ
+strℕ₁ = 1 ◂ map suc strℕ₁
+
+s1 = strℕ
+s2 = strℕ₁
 
 infixr 5 _~_
 
 data _~_ {A} : (xs ys : Stream A) → Set where
   _◂_ : ∀ {x y xs ys} → (x ≡ y) → (xs ~ ys) → x ◂ xs ~ y ◂ ys
 
--- ⁻\°-o/⁻
-streamEq : {A : Set} → {s1 s2 : Stream A} → (headS s1 ≡ headS s2) → (tailS s1 ≡ tailS s2) → (s1 ≡ s2)
-streamEq {_} {(a ◂ as)} {(b ◂ bs)} headsProp tailsProp = {!!}
-
-{-Q:
+{-- ⁻\°-o/⁻
 -The operators given in module Coinductive (∞,♯,♭), are they essential when handling coinductive types or are they just 'helpers'? (Haven't studied them yet)
 
 -What about CoPatterns (Abel: http://www.lorentzcenter.nl/lc/web/2014/603/presentations/Abel.pdf), should I know about this?
