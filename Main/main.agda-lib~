@@ -1,0 +1,4 @@
+name: prelude-test
+include: .
+depend: agda-prelude
+	standard-library
