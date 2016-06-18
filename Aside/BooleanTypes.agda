@@ -11,11 +11,6 @@ data 𝔹 : Set where
   tt : 𝔹
   ff : 𝔹
 
--- use pragmas
-{-# BUILTIN BOOL 𝔹 #-}
-{-# BUILTIN TRUE tt #-}
-{-# BUILTIN FALSE ff #-}
-{-# COMPILED_DATA 𝔹 Bool True False #-}
 
 -- precedence rules 
 -- The order is taken from https://en.wikipedia.org/wiki/Logical_connective

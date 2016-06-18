@@ -1,4 +1,4 @@
-module Equality where
+module postulates where
 
 open import level
 

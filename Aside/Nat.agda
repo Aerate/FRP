@@ -12,12 +12,6 @@ data ℕ : Set where
   zero : ℕ
   suc : ℕ → ℕ
 
-{-# BUILTIN NATURAL ℕ #-}
-
-infixl 10 _*_
-infixl 9 _+_ _-_
-infixl 8 _<_ 
-
 -- Induction and recursion over ℕ
 -- !Q: Is the sig for natind actually the same as for natrec, where the props are just 'hidden' in Type C?
 natrec : {C : Set} → C → (ℕ → C → C) → ℕ → C
