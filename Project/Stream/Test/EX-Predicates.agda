@@ -20,7 +20,7 @@ isTrue : Stream Bool → RSet
 isTrue x = x ≡ₛ true ▸⋯  
  
 isFalse : Stream Bool → RSet
-isFalse x = x ≡ₛ repeat false
+isFalse x = x ≡ₛ false ▸⋯  
 
 isEmpty : (s1 s2 : Stream Bool) → RSet
 isEmpty s1 s2 = ¬ₛ (s1 ≡ₛ s2)
