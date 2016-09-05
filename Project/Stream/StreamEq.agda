@@ -32,10 +32,6 @@ tl≡ (∃-Bisim c d x y p) = ∃-Bisim c d x' y' (tlB p) where
       x' = proj₂ (c x)
       y' = proj₂ (d y)
 
--- Todo (where we want to go)
-postulate equals : ∀ {a} {A X Y : Set a} {s1 s2 : Stream A} (c : X → A × X) (d : Y → A × Y) (x : X) (y : Y) → (corec c x) ≡ₛ (corec d y) → s1 ≡ s2
-
-
 {-
 * after https://github.com/hbasold
 see also:

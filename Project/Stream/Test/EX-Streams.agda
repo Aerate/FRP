@@ -1,4 +1,4 @@
-module Stream.Testdata where
+module Stream.Test.EX-Streams where
 
 open import Stream.Stream
 open import Data.Bool

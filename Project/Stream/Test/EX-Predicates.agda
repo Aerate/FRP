@@ -1,4 +1,4 @@
-module Stream.StreamSet where
+module Stream.Test.EX-Predicates where
 
 open import Data.Empty
 open import Data.Unit
@@ -10,9 +10,11 @@ open import Relation.Binary.PropositionalEquality
 open import Data.Product
 open import Data.Sum
 
-open import Stream.Testdata
 open import Stream.Stream
 open import Stream.RSet
+
+open import Stream.Test.EX-Streams
+
 
 isTrue : Stream Bool → RSet
 isTrue x = x ≡ₛ true ▸⋯  
