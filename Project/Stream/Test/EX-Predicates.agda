@@ -47,17 +47,22 @@ changesToFalse x = (¬ₛ isFalse x) →ₛ ○ (isFalse x)
 hdTT : hd (isTrue TcT) 
 hdTT = refl
 
-lTT : ⟦ ⟨ Bool ⟩ ⟧
+lTT : ⟦ ⟪ Bool ⟫ ⟧
 now lTT = true
 later lTT = lTT
 
 prfTT : ⟦ isTrue T-T ⟧
-now prfTT = hd (repeat refl)
+now prfTT = refl
 later prfTT = prfTT
+
+prfTT' : ⟦ (true ≡ true) ▸⋯ ⟧
+prfTT' = refl ▹⋯
 
 prfFF : ⟦ isFalse F-F ⟧
 now prfFF = refl
 later prfFF = prfFF
+-- refl ▹⋯ 
+
 
 prfC-lem' : ⟦ ○ (changesToTrue F-T-T) ⟧
 now prfC-lem' = (λ x → refl)
@@ -92,11 +97,6 @@ prfI : ⟦ ¬ₛ (false ▸⋯ ≡ₛ true ▸⋯) ⟧
 now prfI ()
 later prfI = prfI
 
---ora : Oracle
---propos ora =  ¬ₛ (false ▸⋯ ≡ₛ true ▸⋯)
---inspct ora () 
---verdct ora = yes
-
 prfJ : ⟦ TcT ≡ₛ T-T ⟧
 now prfJ = refl
 later prfJ = prfJ
@@ -108,3 +108,27 @@ later prfAND = prfAND
 prfOR : ⟦ (isTrue T-T) ⊎ₛ (isTrue F-F) ⟧
 now prfOR = inj₁ refl
 later prfOR = prfOR
+
+--------------------------
+-- Future / eventually
+--------------------------
+
+di-lemma' : ∀ {R} → ⟦ (◇ (◇ R)) ⟧ ≡ ⟦ ◇ R ⟧
+di-lemma' = {!!}
+
+prfF1-1 : ⟦ ◇ (isTrue T-T) ⟧
+now prfF1-1 = ◇-now refl
+later prfF1-1 = prfF1-1
+
+prfF1-2 :  ⟦ ◇ (isTrue F-T-T) ⟧
+prfF1-2  = (◇-later {!(isTrue F-T-T)!}) ► {!!}
+
+
+
+prfF1 : {R : RSet} → ⟦ ◇ (◇ R) →ₛ ◇ R ⟧
+now prfF1 x = {!!}
+later prfF1 = {!!}
+
+--prfG1 : ⟦ □ (Bool ▸⋯) ⟧
+--now prfG1 = true ▹⋯
+--later prfG1 = prfG1
