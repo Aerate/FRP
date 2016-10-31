@@ -2,3 +2,7 @@
 *.agda~
 .gitignore
 *.agda-lib~
+/FRP/*
+/LTL/*
+/Stream/Tries/*
+/Stream/IDEAS/*

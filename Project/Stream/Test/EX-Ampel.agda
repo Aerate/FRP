@@ -32,3 +32,11 @@ later (later pred2) = pred2
 
 pred3 : ⟦ (stA1 ≡ₛ red ▸⋯) U (stA2 ≡ₛ red ▸⋯) ⟧ 
 pred3 = {!!}
+
+--  
+liveness1 : ⟦ eventually (stA1 ≡ₛ green ▸⋯ ) ⟧
+now liveness1 = ◇-now refl
+now (later liveness1) = ◇-later (◇-now refl)
+later (later liveness1) = liveness1
+
+-- liveness1 mit ⟪_⟫ 

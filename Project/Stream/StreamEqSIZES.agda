@@ -6,19 +6,14 @@ open import Level
 open import Data.Product
 open import Relation.Binary.PropositionalEquality
 
+
 -- two Streams are equal if they are pointwise equal ∀ {i}
-record _~ₛ_  {a : Level} {A : Set a} (s1 s2 : Stream A) : Set a  where
+record _~ₛ_ {i : Size} {a : Level} {A : Set a} (s1 s2 : Stream  {i} A) : Set (suc a)  where
   coinductive
   field
     hd~ : hd s1 ≡ hd s2
-    tl~ : tl s1 ~ₛ tl s2
+    tl~ : ∀ {j : Size< i} → tl s1 ~ₛ tl s2 {j}
 open _~ₛ_ public
---: ∀ {a b} {A : Set a} {B : Set b}
---       (f : A → B) {x y} → x ≡ y → f x ≡ f y
-
---congs : ∀ {a b} {A : Set a} {B : Set b} {sa : Stream A} {sb : Stream B} (f : A → B)
---        {x : hd sa} {y : (hd sb)} → x ≡ y → f x ≡ f y
---congs = ? --mapₛ cong
 
 s≡s : {a : Level} {A : Set a} → (s : Stream A) → s ≡ s 
 s≡s s = refl
@@ -30,7 +25,7 @@ s≡s s = refl
 
 -- Bisimulations* 
 -- idea: two coalgebras X → F(X) and Y → F(Y) s.t. x ∈ X & y ∈ Y are bisimilar ∀ {i} (i.e. ext-equiv)
-record Bisim  {i : Size} {a : Level} {A X Y : Set a} (c : X → A × X) (d : Y → A × Y) (x : X) (y : Y) : Set a where
+record Bisim  {i : Size} {a : Level} {A X Y : Set a} (c : X → A × X) (d : Y → A × Y) (x : X) (y : Y) : Set (suc a) where
   coinductive
   field
     hdB : proj₁ (c x) ≡ proj₁ (d y)
