@@ -20,7 +20,7 @@ natz = corec (str-out' nats) 0
 
 FcT : Stream Bool
 FcT = corec (λ x → x , (not x)) false
- 
+
 TcF : Stream Bool
 TcF = corec (λ x → x , (not x)) true
 
@@ -58,3 +58,7 @@ repeat>F-T-T = ⟨ false ▸ true ▸ true ⟩ ▸⋯
 
 --⊤-⊥ : RSet
 --⊤-⊥ =  ⟨ (⊥ ▹ ⊤) ⟩▹⋯
+
+testv : Vec Bool 2
+testv = false ▸ (false ▸ [])
+
