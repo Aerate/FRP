@@ -2,7 +2,7 @@ module Model.Graphs.Graph where
 
 open import Data.Fin
 open import Stream.Stream
-open import Stream.RSet
+open import RSet.RSet
 open import Data.Empty
 open import Data.Unit
 open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)

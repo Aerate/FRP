@@ -22,11 +22,6 @@ record Stream {i : Size} {a} (A : Set a) : Set a where
     tl : ∀ {j : Size< i} → Stream {j} A
 open Stream public; S = Stream 
 
-
-test : Stream ℕ
-hd test = 1
-tl test = test
-
 --ℕ
 toStr : ∀ {a} {A : Set a} → (ℕ → A) → Stream A
 hd (toStr f) = f 0
