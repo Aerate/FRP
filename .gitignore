@@ -2,3 +2,4 @@
 *.agda~
 .gitignore
 *.agda-lib~
+*.agda-lib
