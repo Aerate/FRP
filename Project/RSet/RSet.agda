@@ -23,6 +23,7 @@ infix 7 _▹_
 RSet : ∀ {i} → Set₁
 RSet {i} = Stream {i} Set
 
+-- 
 record ⟦_⟧ (R : RSet) : Set where 
   coinductive
   constructor _►_   
