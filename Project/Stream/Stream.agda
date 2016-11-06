@@ -1,18 +1,24 @@
+------------------------------------------------------------------------
+-- R⋯⟩ 
+--
+-- Streams
+------------------------------------------------------------------------
+
 module Stream.Stream where
 
-open import Level renaming (suc to lsuc)
-open import Size
+open import Level renaming (suc to lsuc) public
+open import Size public
 open import Data.Nat hiding (_⊔_)
 open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)
 open import Data.Product
-open import Util
 open import Data.List
+open import Function
 
 infix 3 ⟨_▸⋯ _▸⋯
 infixr 5  _▸_ 
 
 -- coinductively defined parametric Streams annotated by sizes
-record Stream {i : Size} {a} (A : Set a) : Set a where
+record Stream {i : Size} {a : Level} (A : Set a) : Set a where
   coinductive
   constructor _▸_
   field
@@ -20,42 +26,42 @@ record Stream {i : Size} {a} (A : Set a) : Set a where
     tl : ∀ {j : Size< i} → Stream {j} A
 open Stream public; S = Stream 
 
---constant
+-- constant
 _▸⋯  : ∀ {a} {A : Set a} → A → Stream A 
 hd (x ▸⋯ ) = x
 tl (x ▸⋯ ) = x ▸⋯  
 repeat = _▸⋯ 
 
---ℕ
+-- ℕ
 toStr : ∀ {a} {A : Set a} → (ℕ → A) → Stream A
 hd (toStr f) = f 0
 tl (toStr f) = toStr (λ n → f (suc n)) 
 
---drop
+-- drop
 dropₛ : ∀ {a} {A : Set a} → ℕ → Stream A → Stream A
 dropₛ 0       s = s
 dropₛ (suc n) s = dropₛ n (tl s)
 
---take
+-- take
 takeₛ : ∀ {a} {A : Set a} (n : ℕ) → Stream A → Vec A n
 takeₛ 0 xs = []
 takeₛ (suc n) xs = hd xs ▸ takeₛ n (tl xs)
 
---index
+-- index
 _at_ : ∀ {a} {A : Set a} → Stream A → ℕ → A
 s at n = hd (dropₛ n s)
 
---map
+-- map
 mapₛ : ∀ {i a b} {A : Set a} {B : Set b} (f : A → B) (s : Stream {i} A) → Stream {i} B
 hd (mapₛ f s) = f (hd s)
 tl (mapₛ {i} f s) {j} = mapₛ {j} f (tl s {j})
  
---prepend Vector
+-- prepend vector
 _++ₛ_ : ∀ {a} {A : Set a} {n : ℕ} → Vec A n → Stream A → Stream A
 []       ++ₛ s = s
 (a ▸ as) ++ₛ s = a ▸ (as ++ₛ s)
 
---interleave 
+-- interleave 
 _⋎_ :  ∀ {a} {A : Set a} → (s1 s2 : Stream A) → Stream A 
 hd (s1 ⋎ s2) = hd s1
 tl (s1 ⋎ s2) = s2 ⋎ (tl s1)
@@ -64,12 +70,13 @@ _fby_ : ∀ {a} {A : Set a} → (s1 s2 : Stream A) → Stream A
 hd (s1 fby s2) = hd s1
 tl (s1 fby s2) = s2
 
--- coalgebra
+-- coalgebra / fold
 str-out : ∀ {a} {A : Set a} → Stream A → A × Stream A
 str-out s = (hd s) , tl s
 
---corecursion
+-- corecursion / unfold
 corec : ∀ {a} {A X : Set a} → (X → A × X) → (∀ {i} → X → Stream {i} A)
+--corec : ∀ {a} {A X : Set a} → (X → A × X) → (X → Stream A)
 hd (corec f x) = proj₁ (f x)
 tl (corec f x) = corec f (proj₂ (f x))
 
@@ -80,7 +87,7 @@ tl (corec' h s x) = corec' h s (s x)
 str-out' : ∀ {a i} {A X : Set a} → (Stream {i} A) → (X → A × X)
 str-out' s x = (hd s) , x
 
--- repeat a given Vector (cycle) 
+-- repeat a given vector (alias cycle) 
 ⟨_▸⋯ : ∀ {a n} {A : Set a} → Vec A (suc n) → Stream A
 ⟨ xs ▸⋯ = aux xs []
   where aux : ∀ {a n m} {A : Set a} → Vec A (suc n) → Vec A m → Stream A

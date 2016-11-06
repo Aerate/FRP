@@ -5,7 +5,7 @@ open import Data.Unit
 open import Size
 open import Data.Nat
 open import Data.Bool
-open import Data.Vec
+open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)
 open import Relation.Binary.PropositionalEquality
 open import Data.Product
 open import Data.Sum
@@ -47,22 +47,21 @@ changesToFalse x = (¬ₛ isFalse x) →ₛ ○ (isFalse x)
 hdTT : hd (isTrue TcT) 
 hdTT = refl
 
-lTT : ⟦ ⟪ Bool ⟫ ⟧
-now lTT = true
-later lTT = lTT
+--lTT : ⟦ ⟪ Bool ⟫ ⟧
+--now lTT = true
+--later lTT = lTT
 
 prfTT : ⟦ isTrue T-T ⟧
 now prfTT = refl
 later prfTT = prfTT
 
-prfTT' : ⟦ (true ≡ true) ▸⋯ ⟧
-prfTT' = refl ▹⋯
+--prfTT' : ⟦ (true ≡ true) ▸⋯ ⟧
+--prfTT' = refl ▹⋯
 
 prfFF : ⟦ isFalse F-F ⟧
 now prfFF = refl
 later prfFF = prfFF
 -- refl ▹⋯ 
-
 
 prfC-lem' : ⟦ ○ (changesToTrue F-T-T) ⟧
 now prfC-lem' = (λ x → refl)
@@ -118,17 +117,27 @@ di-lemma' = {!!}
 
 prfF1-1 : ⟦ ◇ (isTrue T-T) ⟧
 now prfF1-1 = ◇-now refl
-later prfF1-1 = prfF1-1
+later prfF1-1 = {!!}
+
+prfF1-2l :  ⟦ (tl F-T-T) ≡ₛ T-T ⟧
+now prfF1-2l = refl
+later prfF1-2l = {!!}
 
 prfF1-2 :  ⟦ ◇ (isTrue F-T-T) ⟧
-prfF1-2  = (◇-later {!(isTrue F-T-T)!}) ► {!!}
+now prfF1-2 = ◇-later (◇-now refl)
+now (later prfF1-2) = {!!}
+later (later prfF1-2) = {!!}
 
+prfF1-2a :  ⟦ ◇ ( true ▸⋯ ≡ₛ false ▸ ⟨ true ▸ true ⟩ ▸⋯ ) ⟧
+now prfF1-2a = ◇-later (◇-now refl)
+later prfF1-2a = {!!}
 
+prfF1 : {R : Stream Set} → ⟦ ◇ (◇ R) ⟧ → ⟦ ◇ R ⟧
+prfF1 = {!!}
 
-prfF1 : {R : RSet} → ⟦ ◇ (◇ R) →ₛ ◇ R ⟧
-now prfF1 x = {!!}
-later prfF1 = {!!}
-
---prfG1 : ⟦ □ (Bool ▸⋯) ⟧
---now prfG1 = true ▹⋯
---later prfG1 = prfG1
+-- --prfG1 : ⟦ □ (Bool ▸⋯) ⟧
+-- --now prfG1 = true ▹⋯
+-- --later prfG1 = prfG1
+--  ⟦ ◇ (lift2 _≡_ (true ▸⋯) (false ▸ (λ {j} → .Stream.Stream._.aux (true ▸ true ▸ []) (true ▸ true ▸ []) []))) ⟧ →
+--  ⟦ ◇ (lift2 _≡_ (true ▸⋯)                  (.Stream.Stream._.aux (true ▸ true ▸ []) (true ▸ true ▸ []) [])) ⟧
+-- {R} → now ⟦ ◇ (◇ .R) ⟧
