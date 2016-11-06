@@ -3,4 +3,4 @@
 .gitignore
 *.agda-lib~
 *.agda-lib
-/Project/Test/*
+Project/Test/*
