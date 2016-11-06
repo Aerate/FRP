@@ -1,6 +1,7 @@
 *.agdai
 *.agda~
 .gitignore
+.gitignore~
 *.agda-lib~
 *.agda-lib
 Project/Test/*
