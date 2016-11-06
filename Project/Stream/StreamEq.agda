@@ -1,8 +1,14 @@
+------------------------------------------------------------------------
+-- R⋯⟩ 
+--
+-- Properties of stream equivalence and bisimulation principle
+--
+-- code (*) adapted from https://github.com/hbasold
+------------------------------------------------------------------------
+
 module Stream.StreamEq where
 
 open import Stream.Stream
-open import Size
-open import Level
 open import Data.Product
 open import Relation.Binary.PropositionalEquality
 
@@ -15,7 +21,7 @@ record _~ₛ_  {a : Level} {A : Set a} (s1 s2 : Stream A) : Set a  where
 open _~ₛ_ public
 
 -- Bisimulations* 
--- idea: two coalgebras X → F(X) and Y → F(Y) s.t. x ∈ X & y ∈ Y are bisimilar ∀ {i} (i.e. ext-equiv)
+-- idea: two coalgebras X → F(X) and Y → F(Y) s.t. x ∈ X & y ∈ Y are bisimilar ∀ {i : Index (Size)} (i.e. ext-equiv)
 record Bisim  {i : Size} {a : Level} {A X Y : Set a} (c : X → A × X) (d : Y → A × Y) (x : X) (y : Y) : Set a where
   coinductive
   field
@@ -30,9 +36,5 @@ tl~ (∃-Bisim c d x y p) = ∃-Bisim c d x' y' (tlB p) where
       x' = proj₂ (c x)
       y' = proj₂ (d y)
 
-{-
-* after https://github.com/hbasold
-see also:
-cs.ioc.ee/ewscs/2011/jacobs/jacobs-slides.pdf
-http://homepages.cwi.nl/~janr/papers/files-of-papers/2011_Jacobs_Rutten_new.pdf
--}
+data _≡ₛ_ {a : Level} {A : Set a} (s1 s2 : Stream A) : Set a  where
+  s≡s : s1 ~ₛ s2 → s1 ≡ₛ s2 

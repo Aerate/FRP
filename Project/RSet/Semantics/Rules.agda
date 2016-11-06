@@ -1,17 +1,16 @@
-module RSet.Semantics where
+module RSet.Semantics.Rules where
 
-open import Size
-open import Function
-open import Stream.Stream
+open import Data.Bool public
+open import Function public
 open import Data.Empty
 open import Data.Unit
-open import Data.Bool
 open import Relation.Binary.PropositionalEquality
 
-open import RSet.RSet
+open import RSet.Core
 
+-- Iso
 record _≈_ (A B : Set) : Set where
-  constructor ≈ₑ 
+  constructor ≈ₛ 
   field
     f : A → B
     g : B → A
@@ -38,15 +37,3 @@ op f c = f ∘ c
 
 drop1 : ∀ {B : Set} → (B → Stream Bool) → (B → Stream Bool)
 drop1 b = ((dropₛ 1) ∘ b) 
-
--- --semi-haendische reduktion zu NF :
--- hd (tl (c (λ x → mapₛ embed (b x)))) !≡! hd (c (λ x → mapₛ embed (tl (b x))))
---
--- c auch lesbar als {c : (B → Stream Set) → Stream Set} ?
--- 
--- _≈_.f = hd (tl ( { ?? } (op ○ c (lift1 embed ∘ b)) ))
-sem-○ : ∀ {B : Set} (b : B → Stream Bool) (c : cont B) → ((drop1 b) ⊨ c) ≈ (b ⊨ (op ○ c))
-_≈_.f (sem-○ b c) x = hd (tl ( lift1 {!!} (op ○ c (lift1 embed ∘ b)) ))
-_≈_.g (sem-○ b c) x = {!!}
-_≈_.invₗ (sem-○ b c) = {!!}
-_≈_.invᵣ (sem-○ b c) = {!!}
