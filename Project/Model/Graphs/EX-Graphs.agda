@@ -2,11 +2,10 @@ module  Model.Graphs.EX-Graphs where
 
 open import Model.Graphs.Graph
 open import Data.Fin
-open import Stream.Stream hiding ( zero )
-open import RSet.RSet
+open import Stream.Stream 
+open import RSet.Core
 open import Data.Empty
 open import Data.Unit
-open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)
 
 -- Example
 -- 0 <---------+

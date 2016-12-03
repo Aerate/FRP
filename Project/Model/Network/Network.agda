@@ -1,2 +1,2 @@
-module Model.Network.Network where
+module Model.Network.Network where -- something should be done
 

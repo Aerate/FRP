@@ -8,10 +8,9 @@ module Model.Graphs.Graph where
 
 open import Data.Fin
 open import Stream.Stream
-open import RSet.RSet
+open import RSet.Core
 open import Data.Empty
 open import Data.Unit
-open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)
 
 record Graph (Node : Set) : Set₁ where
   constructor g
