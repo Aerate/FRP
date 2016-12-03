@@ -11,7 +11,3 @@ data hd◇ (R : RSet) : Set where
 hd (◇ R) = hd◇ R
 tl (◇ R) = ◇ (tl R)
 eventually = ◇ 
-
-
---di-lemma : ∀ {R} → ⟦ (◇ (◇ R)) ⟧ ≡ ⟦ ◇ R ⟧
---di-lemma = {!!}

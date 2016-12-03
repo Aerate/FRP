@@ -3,21 +3,18 @@ module RSet.Globally where
 open import RSet.Core
 open import RSet.Next
 
-
-record hd□ (R : RSet) : Set where
-  inductive
+record □ (R : RSet) : Set where
+  coinductive
+  constructor always_
   field
     □-now   : hd R
-    □-later : hd□ (○ R)
+    □-later : □ (○ R)
+open □ public
 
-□ : ∀ {i : Size} → RSet → RSet
-hd (□ x) = hd□ x
-tl (□ x) = □ (tl x)
+□ₛ : ∀ {i : Size} → RSet → RSet
+hd (□ₛ x) = □ x
+tl (□ₛ x) = □ₛ (tl x)
 
---□ : ∀ {i : Size} → RSet → RSet
---hd (□ x) = ⟦ x ⟧
---tl (□ x) = □ (tl x)
-
---□ : ∀ {i : Size} → RSet → RSet
---hd (□ A) = hd A
---tl (□ A) = □ (tl A)
+-- to be refined
+never : ∀ {i : Size} → RSet → RSet
+never = ¬ₛ_

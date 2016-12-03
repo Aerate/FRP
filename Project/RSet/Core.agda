@@ -8,9 +8,8 @@ module RSet.Core where
 
 open import Size public
 open import Stream.Stream public
-open import Data.Nat
-open import Data.Vec
-open import Data.Fin
+open import Data.Nat renaming   (_∸_ to _-_)
+open import Data.Vec 
 open import Data.Product
 open import Data.Sum
 open import Relation.Nullary
@@ -22,7 +21,6 @@ open import Relation.Binary.Core
 RSet : ∀ {i} → Set₁
 RSet {i} = Stream {i} Set
 
-
 -- The elements of RSet may be inspected under temporal reading of now and later
 
 record ⟦_⟧ (R : RSet) : Set where 
@@ -33,14 +31,24 @@ record ⟦_⟧ (R : RSet) : Set where
     later : ⟦ tl R ⟧
 open ⟦_⟧ public
 
--- ⟪ v ⟫ provides the structure for a vector of inhabitants in RSet
+-- vector representing a closed interval over RSet
 
-data ⟪_⟫ : {n : ℕ} (V : Vec Set n) → Set where
-  []  : ⟪ [] ⟫ 
-  _▹_ : {n : ℕ} → {v : Vec Set (suc n)} → head v → ⟪ tail v ⟫ → ⟪ v ⟫ 
+_[_,_] : RSet → (s : ℕ) → (u : ℕ) → Vec Set (u - s)
+A [ 0 , 0 ]         = []
+A [ 0 , suc u ]     = takeₛ (suc u) A
+A [ suc s , 0 ]     = []
+A [ suc s , suc u ] = takeₛ ((suc u) - (suc s)) (dropₛ s A)
+getInterval = _[_,_]
 
+{-
+todo : semi-open interval
 
+_[_,_⟩ : RSet → ℕ → ℕ → RSet
+-}
+
+-----------------------------------------------
 -- liftings
+-----------------------------------------------
 
 ¬ₛ_ : RSet → RSet
 ¬ₛ_ = mapₛ ¬_
@@ -66,4 +74,15 @@ _≡ₐ_ = lift2 _≡_
 _≢ₛ_ : {A : Set} → Stream A → Stream A → RSet
 _≢ₛ_ = lift2 _≢_
 
+{-
+-----------------------------------------------
+-- proof vectors for shapes of RSet
+-----------------------------------------------
 
+-- ⟪ v ⟫ provides the structure for a vector of inhabitants in RSet
+
+data ⟪_⟫ : {n : ℕ} (V : Vec Set n) → Set where
+  []  : ⟪ [] ⟫ 
+  _▹_ : {n : ℕ} → {v : Vec Set (suc n)} → head v → ⟪ tail v ⟫ → ⟪ v ⟫ 
+
+-}

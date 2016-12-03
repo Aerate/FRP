@@ -1,23 +1,22 @@
 ------------------------------------------------------------------------
 -- R⋯⟩ 
---
 -- Streams
 ------------------------------------------------------------------------
 
 module Stream.Stream where
 
-open import Level renaming (suc to lsuc) public
+open import Level renaming (suc to lsuc) renaming (zero to ℓ₀) public
 open import Size public
 open import Data.Nat hiding (_⊔_)
-open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_)
+open import Data.Vec hiding (_⋎_) renaming (_∷_ to _▸_) public
 open import Data.Product
 open import Data.List
 open import Function
 
-infix 3 ⟨_▸⋯ _▸⋯
+infix 6 ⟨_▸⋯ _▸⋯
 infixr 5  _▸_ 
 
--- coinductively defined parametric Streams annotated by sizes
+-- coinductively defined parametric streams annotated by sizes
 record Stream {i : Size} {a : Level} (A : Set a) : Set a where
   coinductive
   constructor _▸_
@@ -87,18 +86,33 @@ tl (corec' h s x) = corec' h s (s x)
 str-out' : ∀ {a i} {A X : Set a} → (Stream {i} A) → (X → A × X)
 str-out' s x = (hd s) , x
 
--- repeat a given vector (alias cycle) 
-⟨_▸⋯ : ∀ {a n} {A : Set a} → Vec A (suc n) → Stream A
-⟨ xs ▸⋯ = aux xs []
-  where aux : ∀ {a n m} {A : Set a} → Vec A (suc n) → Vec A m → Stream A
-        hd (aux keep (x ▸ count)) = x
-        tl (aux keep (x ▸ count)) = aux keep count
-        hd (aux (v ▸ vs) []) = v
-        tl (aux (v ▸ vs) []) = aux (v ▸ vs) vs
+str-app : ∀ {X A : Set} → Stream (X → A) → Stream X → Stream A
+hd (str-app fs ss) = hd fs (hd ss)
+tl (str-app fs ss) = str-app (tl fs) (tl ss)
 
-infix 7 _⟩ 
-_⟩ : ∀ {A : Set} → A → Vec A 1 
-a ⟩ = a ▸ []
+-----------------------------------------------
+-- No laws!
+-----------------------------------------------
+
+record Functor (F : Set → Set) : Set₁ where
+  field
+    fmap : ∀ {X A} → (X → A) → F X → F A
+open Functor {{...}} public
+
+record Applicative (F : Set → Set) : Set₁ where
+  infixl 2 _✴_ 
+  field
+    pure : ∀ {X} → X → F X
+    _✴_  : ∀ {X A} → F (X → A) → F X → F A
+  applicativeFunctor : Functor F
+  applicativeFunctor = record {fmap = _✴_ ∘ pure}
+open Applicative {{...}} public
+
+applicativeStream : Applicative (λ X → Stream X)
+applicativeStream = record { pure = repeat ; _✴_ = str-app }
+
+FunctorStream : Functor (λ X → Stream X)
+FunctorStream = record { fmap = mapₛ }
 
 ---------------------------
 -- Function Lifting 
@@ -141,3 +155,20 @@ takeUntil {A = A} s (there any) = hd s ∷ (proj₁ p) , proj₂ p
 d = dropₛ 
 t = takeₛ
 m = mapₛ
+
+---------------------------
+-- Helpers
+---------------------------
+
+-- repeat a given vector (alias cycle) 
+⟨_▸⋯ : ∀ {a n} {A : Set a} → Vec A (suc n) → Stream A
+⟨ xs ▸⋯ = aux xs []
+  where aux : ∀ {a n m} {A : Set a} → Vec A (suc n) → Vec A m → Stream A
+        hd (aux keep (x ▸ count)) = x
+        tl (aux keep (x ▸ count)) = aux keep count
+        hd (aux (v ▸ vs) []) = v
+        tl (aux (v ▸ vs) []) = aux (v ▸ vs) vs
+
+infix 7 _⟩ 
+_⟩ : ∀ {A : Set} → A → Vec A 1 
+a ⟩ = a ▸ []
