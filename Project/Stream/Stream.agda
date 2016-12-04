@@ -1,8 +1,9 @@
 ------------------------------------------------------------------------
--- R⋯⟩ 
 --
 -- Streams as infinite lists that can be parametrized over Sets
+--
 ------------------------------------------------------------------------
+
 module Stream.Stream where
 
 open import Level renaming (suc to ℓ⁺; zero to ℓ₀) public
@@ -21,7 +22,7 @@ infixr 5  _▸_
 --
 -- copatterns serve double duty:
 -- the first element of a stream may be extracted by hd
--- while tl extracts the substream after head
+-- while tl extracts the substream after the first element
 
 record Stream {i : Size} {a : Level} (A : Set a) : Set a where
   coinductive
@@ -78,15 +79,3 @@ str-out s = (hd s) , tl s
 corec : ∀ {a} {A X : Set a} → (X → A × X) → (∀ {i} → X → Stream {i} A)
 hd (corec f x) = proj₁ (f x)
 tl (corec f x) = corec f (proj₂ (f x))
-
---corec' : ∀ {X A : Set} → (X → A) → (X → X) → (X → Stream A)
---hd (corec' h s x) = h x
---tl (corec' h s x) = corec' h s (s x)
-
---str-out' : ∀ {a i} {A X : Set a} → (Stream {i} A) → (X → A × X)
---str-out' s x = (hd s) , x
-
--- applicative mapping
-_<*>_ : ∀ {X A : Set} → Stream (X → A) → Stream X → Stream A
-hd (fs <*> ss) = hd fs (hd ss)
-tl (fs <*> ss) = (tl fs) <*> (tl ss)

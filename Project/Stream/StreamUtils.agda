@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------
--- R⋯⟩ 
 --
--- Utilities for stream
+-- Utilities for Streams
+--
 ------------------------------------------------------------------------
 module Stream.StreamUtils where
 
@@ -19,6 +19,11 @@ infix 7 _⟩
 -- Functor and applicative instance
 -- Note: None of the laws are currently implemented
 ----------------------------------------------------
+
+-- applicative mapping
+_<*>_ : ∀ {X A : Set} → Stream (X → A) → Stream X → Stream A
+hd (fs <*> ss) = hd fs (hd ss)
+tl (fs <*> ss) = (tl fs) <*> (tl ss)
 
 record Functor (F : Set → Set) : Set₁ where
   field

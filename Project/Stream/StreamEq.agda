@@ -1,9 +1,7 @@
 ------------------------------------------------------------------------
--- R⋯⟩ 
 --
 -- Properties of stream equivalence and bisimulation principle
 --
--- code (*) adapted from https://github.com/hbasold
 ------------------------------------------------------------------------
 
 module Stream.StreamEq where
@@ -38,3 +36,5 @@ tl~ (∃-Bisim c d x y p) = ∃-Bisim c d x' y' (tlB p) where
 
 data _≡ₛ_ {a : Level} {A : Set a} (s1 s2 : Stream A) : Set a  where
   s≡s : s1 ~ₛ s2 → s1 ≡ₛ s2 
+
+-- code (*) adapted from https://github.com/hbasold

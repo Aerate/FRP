@@ -3,10 +3,14 @@ open import RSet.Next
 
 module RSet.Until where
 
-data _hdU_ (R S : RSet) : Set where
-  finally : hd S → R hdU S
-  _until_ : hd R → (○ R) hdU (○ S) → R hdU S
+{-
+ψ has to hold at least until φ holds
+-}
 
-_U_ : RSet → RSet → RSet
-hd (R U S) = R hdU S
-tl (R U S) = (○ R) U (○ S)
+data _U_ (φ ψ : RSet) : Set where
+  finally : hd φ → φ U ψ
+  _until_ : hd ψ → (○ ψ) U (○ ψ) → φ U ψ
+
+_Until_ : RSet → RSet → RSet
+hd (R Until S) = R U S
+tl (R Until S) = (○ R) Until (○ S)

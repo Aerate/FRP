@@ -36,4 +36,4 @@ op : ∀ {B : Set} → (RSet → RSet) → cont B → cont B
 op f c = f ∘ c
 
 drop1 : ∀ {B : Set} → (B → Stream Bool) → (B → Stream Bool)
-drop1 b = ((dropₛ 1) ∘ b) 
+drop1 b = ((drop 1) ∘ b) 

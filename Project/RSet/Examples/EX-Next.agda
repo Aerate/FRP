@@ -5,10 +5,10 @@ open import RSet.Next
 open import Data.Bool
 open import RSet.Properties.Reasoning
 
--- get a stream of alternating booleans of form true ▸ false 
+-- get a stream of alternating booleans with form true ▸ false 
 
 True-False : Stream Bool
-True-False = ⟨ true ▸ (false ▸ []) ▸⋯ 
+True-False = ⟨ true ▸ false ⟩ ▸⋯ 
 
 -- form a predicate over this stream, for example, is the stream true?
 
