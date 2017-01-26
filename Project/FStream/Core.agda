@@ -97,22 +97,28 @@ proj₁ (FStream.inF (repeat (proj₁ , proj₂))) = proj₁
 FStream'.head (proj₂ (FStream.inF (repeat (proj₁ , proj₂))) x) = proj₂ x
 FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
 
--- Formalisiere: "repeat readSuc gibt immer >0 aus"
-record ■ {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+-- ■ und ◆ stehen für die temporalen Modalitäten, A und E stehen für die Seiteneffekt-Modalitäten
+
+record ■A {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+  -- Zu jeder Zeit, bei jedem Seiteneffekt ist pred erfüllt
   coinductive
   field
-    now■ : □ {Level.zero} {C} {A} pred (map head (inF cas))
-    later■ : □ {Level.zero} {C} {FStream C A} (■ pred) (map tail (inF cas))
+    nowA : □ {Level.zero} {C} {A} pred (map head (inF cas))
+    laterA : □ {Level.zero} {C} {FStream C A} (■A pred) (map tail (inF cas))
+open ■A
 
+data ◆E {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+  -- Irgendwann könnte ein Seiteneffekt auftreten, sodass pred erfüllt ist
+  alreadyE : ◇ {Level.zero} {C} {A} pred (map head (inF cas)) → ◆E pred cas
+  notYetE : ◇ {Level.zero} {C} {FStream C A} (◆E pred) (map tail (inF cas)) → ◆E pred cas
+open ◆E
 
-data ◆ {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
-  now◆ : ◇ {Level.zero} {C} {A} pred (map head (inF cas)) → ◆ pred cas
-  later◆ : ◇ {Level.zero} {C} {FStream C A} (◆ pred) (map tail (inF cas)) → ◆ pred cas
+-- Jederzeit ist die Ausgabe von repeat readSuc positiv, egal welche Werte reinkommen
+always>0 : ■A (_> 0) (repeat readSuc)
+nowA always>0 p = s≤s z≤n
+laterA always>0 p = always>0
 
-always>0 : ■ (_> 0) (repeat readSuc)
-■.now■ always>0 p = s≤s z≤n
-■.later■ always>0 p = always>0
-
+-- Summiert alle Werte in der Reader-Umgebung auf
 sumFrom : ℕ → FStream (ReaderC ℕ) ℕ
 proj₁ (inF (sumFrom n0)) = tt
 head (proj₂ (inF (sumFrom n0)) n) = n0 + n
@@ -121,5 +127,28 @@ tail (proj₂ (inF (sumFrom n0)) n) = sumFrom (n0 + n)
 sum : FStream (ReaderC ℕ) ℕ
 sum = sumFrom 0
 
-eventuallysometimes>2 : ◆ (_> 2) sum
-eventuallysometimes>2 = now◆ (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
+-- Es ist möglich, dass irgendwann die Summe größer als 2 ist
+eventuallysometimes>2 : ◆E (_> 2) sum
+eventuallysometimes>2 = alreadyE (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
+-- und zwar schon nach dem ersten Schritt, falls 3 als Eingabe kommt
+
+
+record ■E {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+  -- Jederzeit könnte ein Seiteneffekt auftreten, sodass pred erfüllt ist
+  coinductive
+  field
+    nowE : ◇ {Level.zero} {C} {A} pred (map head (inF cas))
+    laterE : ◇ {Level.zero} {C} {FStream C A} (■E pred) (map tail (inF cas))
+open ■E
+
+
+data ◆A {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+  -- Irgendwann ist ein Zeitpunkt erreicht, sodass unter jedem Seiteneffekt pred erfüllt wird
+  alreadyA : □ {Level.zero} {C} {A} pred (map head (inF cas)) → ◆A pred cas
+  notYetA : □ {Level.zero} {C} {FStream C A} (◆A pred) (map tail (inF cas)) → ◆A pred cas
+open ◆A
+
+-- Es ist jederzeit möglich, dass die Summe 2 übersteigt
+alwaysSomehow>2 : ■E (_> 2) sum
+nowE alwaysSomehow>2 = (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
+laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
