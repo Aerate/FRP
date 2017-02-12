@@ -1,19 +1,19 @@
 module FStream.Core where
 
-open import Data.Container
+open import ContainerMonkeyPatched
 open import Relation.Binary.PropositionalEquality
-open import Data.Nat
+open import Data.Nat hiding (_⊔_)
 open import Data.Fin hiding (_+_)
 open import Data.Product hiding (map)
 open import Data.Unit
 open import Level
 
 mutual
-  record FStream {ℓ} (C : Container ℓ) (A : Set ℓ) : Set ℓ where
+  record FStream {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
     inductive
     field
       inF : ⟦ C ⟧ (FStream' C A)
-  record FStream' {ℓ} (C : Container ℓ) (A : Set ℓ) : Set ℓ where
+  record FStream' {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
     coinductive
     field
       head : A
@@ -99,12 +99,12 @@ FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
 
 -- ■ und ◆ stehen für die temporalen Modalitäten, A und E stehen für die Seiteneffekt-Modalitäten
 
-record ■A {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
+record ■A {c ℓ₁ ℓ₂} {A : Set ℓ₁} {C : Container c} (pred : A → Set ℓ₂) (cas : FStream C A) : Set (c ⊔ ℓ₂) where
   -- Zu jeder Zeit, bei jedem Seiteneffekt ist pred erfüllt
   coinductive
   field
-    nowA : □ {Level.zero} {C} {A} pred (map head (inF cas))
-    laterA : □ {Level.zero} {C} {FStream C A} (■A pred) (map tail (inF cas))
+    nowA : APred {c} {ℓ₁} {ℓ₂} {C} {A} pred (map head (inF cas))
+    laterA : APred {c} {ℓ₁ ⊔ c} {ℓ₂ ⊔ c} {C} {FStream C A} (■A pred) (map tail (inF cas))
 open ■A
 
 data ◆E {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
@@ -152,3 +152,18 @@ open ◆A
 alwaysSomehow>2 : ■E (_> 2) sum
 nowE alwaysSomehow>2 = (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
 laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
+
+
+record ■A2 {C : Container Level.zero} (cas : FStream C Set) : Set where
+  coinductive
+  field
+    nowA2 : A (map head (inF cas))
+    laterA2 : APred ■A2 (map tail (inF cas))
+
+
+id : ∀ {ℓ} → Set ℓ → Set ℓ
+id x = x
+{-
+■A2 : {C : Container Level.zero} → (cas : FStream C Set) → Set
+■A2 cas = ■A id cas
+-}
