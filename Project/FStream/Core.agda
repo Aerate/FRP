@@ -2,9 +2,9 @@ module FStream.Core where
 
 open import ContainerMonkeyPatched
 open import Relation.Binary.PropositionalEquality
-open import Data.Nat hiding (_⊔_)
+open import Data.Nat hiding (_⊔_) public
 open import Data.Fin hiding (_+_)
-open import Data.Product hiding (map)
+open import Data.Product hiding (map) public
 open import Data.Unit
 open import Level
 
@@ -58,10 +58,6 @@ drei : PosNat
 drei = 3 because s≤s z≤n
 
 {-
-
-readDouble : ⟦ ReaderC ℕ ⟧ ℕ
-readDouble = map (_* 2) read
-
 data even : ℕ → Set where
   even0 : even 0
   evenss : {n : ℕ} → even n → even (ℕ.suc (ℕ.suc n))
@@ -75,7 +71,33 @@ n*2iseven (ℕ.suc n) = {! evenss  !}
 
 alwaysEven : (n : ℕ) → even (runReader readDouble n)
 alwaysEven = {!   !}
+
 -}
+
+readDouble : ⟦ ReaderC ℕ ⟧ ℕ
+readDouble = map (_* 2) read
+
+data Parity : ℕ → Set where
+  even : (k : ℕ) → Parity (k * 2)
+  odd  : (k : ℕ) → Parity (1 + (k * 2))
+
+parity : (n : ℕ) → Parity n
+parity zero = even 0
+parity (suc n) with parity n
+parity (suc .(k * 2)) | even k = odd k
+parity (suc .(1 + k * 2)) | odd k = even (ℕ.suc k)
+
+*2l : ∀ {n} → Parity n → Parity (n * 2)
+*2l (even k) = even (k * 2)
+*2l (odd k)  = even (1 + (k * 2))
+
+alwaysEven : (n : ℕ) → Parity (runReader readDouble n)
+alwaysEven zero = even 0
+alwaysEven (suc n) = even (1 + n)
+
+alwaysEvenC : □ Parity readDouble
+alwaysEvenC zero = even 0
+alwaysEvenC (suc p) = even (1 + p)
 
 readSuc : ⟦ ReaderC ℕ ⟧ ℕ
 readSuc = map (ℕ.suc) read
