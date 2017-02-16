@@ -21,7 +21,7 @@ mutual
 open FStream public
 open FStream' public
 
-repeat : {A : Set} → {C : Container Level.zero} → ⟦ C ⟧ A -> FStream C A
+repeat : {A : Set} → {C : Container  ℓ₀} → ⟦ C ⟧ A -> FStream C A
 proj₁ (FStream.inF (repeat (proj₁ , proj₂))) = proj₁
 FStream'.head (proj₂ (FStream.inF (repeat (proj₁ , proj₂))) x) = proj₂ x
 FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
