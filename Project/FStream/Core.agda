@@ -21,10 +21,11 @@ mutual
 open FStream
 open FStream'
 
-
 ListC : Container Level.zero
 Shape    ListC   = ℕ
 Position ListC n = Fin n
+
+--isoL1 : ⟦ ListC ⟧ A 'iso' List A
 
 eineListe : ⟦ ListC ⟧ ℕ
 proj₁ eineListe = 2
@@ -39,7 +40,6 @@ Position (StateC S) _ = S
 ReaderC : Set → Container Level.zero
 Shape (ReaderC R) = ⊤
 Position (ReaderC R) _ = R
-
 
 runReader : {R A : Set} → ⟦ ReaderC R ⟧ A → R → A
 runReader (proj₁ , proj₂) r = proj₂ r
@@ -57,47 +57,38 @@ record PosNat : Set where
 drei : PosNat
 drei = 3 because s≤s z≤n
 
-{-
-data even : ℕ → Set where
-  even0 : even 0
-  evenss : {n : ℕ} → even n → even (ℕ.suc (ℕ.suc n))
-
-n*2lemma : {n : ℕ} → even n -> even (2 + n)
-n*2lemma p = {!   !}
-
-n*2iseven : (n : ℕ) → even (2 * n)
-n*2iseven ℕ.zero = even0
-n*2iseven (ℕ.suc n) = {! evenss  !}
-
-alwaysEven : (n : ℕ) → even (runReader readDouble n)
-alwaysEven = {!   !}
-
--}
-
 readDouble : ⟦ ReaderC ℕ ⟧ ℕ
 readDouble = map (_* 2) read
 
-data Parity : ℕ → Set where
-  even : (k : ℕ) → Parity (k * 2)
-  odd  : (k : ℕ) → Parity (1 + (k * 2))
+data even : ℕ → Set where
+  even_z : even 0
+  even_s : {n : ℕ} → even n → even (ℕ.suc (ℕ.suc n))
 
-parity : (n : ℕ) → Parity n
-parity zero = even 0
-parity (suc n) with parity n
-parity (suc .(k * 2)) | even k = odd k
-parity (suc .(1 + k * 2)) | odd k = even (ℕ.suc k)
+{-
 
-*2l : ∀ {n} → Parity n → Parity (n * 2)
-*2l (even k) = even (k * 2)
-*2l (odd k)  = even (1 + (k * 2))
+-- one does not simply ignore ze kommutativity :)
 
-alwaysEven : (n : ℕ) → Parity (runReader readDouble n)
-alwaysEven zero = even 0
-alwaysEven (suc n) = even (1 + n)
+n*2lemma : {n : ℕ} → even n -> even (2 + n)
+n*2lemma p = even_s p
 
-alwaysEvenC : □ Parity readDouble
-alwaysEvenC zero = even 0
-alwaysEvenC (suc p) = even (1 + p)
+n*2lemma_b : {n : ℕ} → even n -> even (n + 2)
+n*2lemma_b even_z = even even_z s
+n*2lemma_b even x s = even n*2lemma_b x s
+
+-}
+
+n*2iseven : (n : ℕ) → even (n * 2)
+n*2iseven ℕ.zero = even_z
+n*2iseven (ℕ.suc n) = even n*2iseven n s
+
+-- spass mit versehentlich implementiertem infix für Konstr. even_s 
+alwaysEven : (n : ℕ) → even (runReader readDouble n)
+alwaysEven ℕ.zero = even_z
+alwaysEven (ℕ.suc n) = even alwaysEven n s
+
+alwaysEvenC : □ even readDouble
+alwaysEvenC ℕ.zero = even_z
+alwaysEvenC (ℕ.suc p) = even alwaysEvenC p s
 
 readSuc : ⟦ ReaderC ℕ ⟧ ℕ
 readSuc = map (ℕ.suc) read
@@ -173,14 +164,21 @@ open ◆A
 -- Es ist jederzeit möglich, dass die Summe 2 übersteigt
 alwaysSomehow>2 : ■E (_> 2) sum
 nowE alwaysSomehow>2 = (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
-laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
+laterE alwaysSomehow>2 = 0 , alwaysSomehow>2
 
+-- Es ist jederzeit möglich, dass die Summe n übersteigt
+alwaysSomehow>n : (n : ℕ) → ■E (_> n) sum
+nowE (alwaysSomehow>n  n) = ℕ.suc n , lem n
+  where lem : (n : ℕ) → ℕ.suc n > n  
+        lem ℕ.zero = s≤s z≤n
+        lem (ℕ.suc n) = s≤s (lem n)
+laterE (alwaysSomehow>n n) = 0 , alwaysSomehow>n n
 
 record ■A2 {C : Container Level.zero} (cas : FStream C Set) : Set where
   coinductive
   field
     nowA2 : A (map head (inF cas))
-    laterA2 : APred ■A2 (map tail (inF cas))
+    laterA2 : APred ■A2 (map tail (inF cas)) -- ∀ moegliche tails -> APred *
 
 
 id : ∀ {ℓ} → Set ℓ → Set ℓ
