@@ -29,11 +29,9 @@ sometimes5 = ℕ.suc (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero))) , refl
 
 
 -- Jederzeit ist die Ausgabe von constantly readSuc positiv, egal welche Werte reinkommen
-always>0 : ∀ {i} → GA {i} (map (_> 0) (constantly readSuc))
+always>0 : GA (map (_> 0) (constantly readSuc))
 nowA always>0 = λ p → s≤s z≤n
 laterA always>0 = λ p → always>0
--- TODO Find good syntactic sugar that spares us the sizes
--- Possibly the change needs to be made in Modalities?
 
 {-
 nowA always>0 p = s≤s z≤n
@@ -55,7 +53,7 @@ eventuallysometimes>2 = alreadyE (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (
 
 
 -- Es ist jederzeit möglich, dass die Summe 2 übersteigt
-alwaysSomehow>2 : ∀ {i} → GE {i} (map (_> 2) sum)
+alwaysSomehow>2 : GE (map (_> 2) sum)
 nowE alwaysSomehow>2 = ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n))
 laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
 {-

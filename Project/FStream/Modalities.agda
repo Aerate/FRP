@@ -60,18 +60,18 @@ record ■A2 {i} {C : Container Level.zero} (cas : FStream {i} C Set) : Set wher
     laterA2 : ∀ {j : Size< i} → APred ■A2 (fmap (tail {j}) (inF cas))
 -}
 
-record GA {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+record GA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
     nowA : A (fmap head (inF cas))
-    laterA : {j : Size< i} → APred (GA {j}) (fmap (λ as → tail {i} as) (inF cas))
+    laterA : APred (GA) (fmap (λ as → tail as) (inF cas))
 open GA public
 
-record GE {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
     nowE : E (fmap head (inF cas))
-    laterE : {j : Size< i} → EPred (GE {j}) (fmap {C = C} (λ as → tail {i} as) (inF cas))
+    laterE : EPred (GE) (fmap {C = C} (λ as → tail as) (inF cas))
 open GE public
 
 data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
