@@ -82,16 +82,20 @@ mutual
   proj₁ (take' n as) = head as
   proj₂ (take' n as) = take n (tail as)
 
-{-
+
 〈_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
      → FVec C A (suc n) → FStream {i} C A
 〈 as ▻⋯ = aux as FNil
   where
-    aux : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
-         → FVec C A (suc n) → FVec C A m → FStream C A
-    inF (aux keep (FCons x)) = fmap (λ av → record { head = proj₁ av ; tail = aux keep (proj₂ av) }) x
-    inF (aux (FCons x) FNil) = fmap (λ av → record { head = proj₁ av ; tail = aux (FCons x) (proj₂ av) }) {!   !}
--}
+    mutual
+      aux : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
+           → FVec C A (suc n) → FVec C A m → FStream {i} C A
+      inF (aux (FCons x) FNil) = fmap (aux2 (FCons x)) x
+      inF (aux keep (FCons x)) = fmap (aux2 keep) x
+      aux2 : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
+        → FVec C A (suc n) → A × FVec C A m → FStream' {i} C A
+      head (aux2 keep (a , _)) = a
+      tail (aux2 keep (_ , v)) = aux keep v
 
 {-
 Stuff that doesn't obviously work:
