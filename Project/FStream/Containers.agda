@@ -20,10 +20,12 @@ ReaderC : Set → Container Level.zero
 Shape (ReaderC R) = ⊤
 Position (ReaderC R) _ = R
 
-
 runReader : {R A : Set} → ⟦ ReaderC R ⟧ A → R → A
 runReader (proj₁ , proj₂) r = proj₂ r
 
 read : ∀ {R} → ⟦ ReaderC R ⟧ R
 proj₁ read = tt
 proj₂ read x = x
+
+returnReader : {R A : Set} → A → ⟦ ReaderC R ⟧ A
+returnReader a = tt , (λ _ → a)

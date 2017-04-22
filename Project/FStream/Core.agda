@@ -56,6 +56,10 @@ mutual
   head (corec' f x) = proj₁ (f x)
   tail (corec' f x) = corec f (proj₂ (f x))
 
+infix 8 _▻_
+infixr 5 _▻'_
+infix 6 ⟨_▻⋯
+infix 7 _⟩
 
 data FVec {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : (n : ℕ) → Set (ℓ₁ ⊔ ℓ₂) where
   FNil : FVec C A 0
@@ -70,8 +74,8 @@ a ▻ v = FCons (fmap (λ x → a , x) v)
 _▻'_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → ⟦ C ⟧ A → (FVec C A n) → FVec C A (suc n)
 a ▻' v = FCons (fmap (λ x → x , v) a)
 
-_〉 : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
-a 〉 = a ▻' FNil
+_⟩ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
+a ⟩ = a ▻' FNil
 
 mutual
   take : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream C A → FVec C A n
@@ -83,9 +87,9 @@ mutual
   proj₂ (take' n as) = take n (tail as)
 
 
-〈_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
+⟨_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
      → FVec C A (suc n) → FStream {i} C A
-〈 as ▻⋯ = aux as FNil
+⟨ as ▻⋯ = aux as FNil
   where
     mutual
       aux : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
