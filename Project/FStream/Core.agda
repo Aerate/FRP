@@ -24,6 +24,14 @@ _►_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C �
 inF (a ► as) = fmap (λ x → record { head = x ; tail = as }) a
 
 mutual
+  _►'_ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → A → FStream {i} C A → FStream {i} C A
+  inF (a ►' as) = fmap (helper a) (inF as)
+  helper : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → A → FStream' {i} C A → FStream' {i} C A
+  head (helper a as) = a
+  tail (helper a as) = head as ►' tail as
+  -- (λ x → record { head = a ; tail = head x ►' tail x })
+
+mutual
   map : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream {i} C A → FStream {i} C B
   inF (map f as) = fmap (map' f) (inF as)
 
