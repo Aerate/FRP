@@ -10,13 +10,13 @@ open import Data.Fin hiding (_+_)
 open import Data.Product hiding (map)
 open import Data.Unit
 open import Level
-open import Function
 open import Size public
 
 
 {-
 
 -- ■ und ◆ stehen für die temporalen Modalitäten, A und E stehen für die Seiteneffekt-Modalitäten
+-- Lieber G & F für die temporalen Modalitäten, ist klarer
 
 record ■A {c ℓ₁ ℓ₂} {A : Set ℓ₁} {C : Container c} (pred : A → Set ℓ₂) (cas : FStream C A) : Set (c ⊔ ℓ₂) where
   -- Zu jeder Zeit, bei jedem Seiteneffekt ist pred erfüllt
@@ -65,40 +65,24 @@ record GA {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ
   field
     nowA : A (fmap head (inF cas))
     laterA : {j : Size< i} → APred (GA {j}) (fmap (λ as → tail {i} as) (inF cas))
-
-GAₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
-inF (GAₛ cas) = {!   !}
-
-GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
-head (GAₛ' cas) = GA cas
-inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
-
-Aₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
-head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
-inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
-
-Gₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
-inF (Gₛ cas) = fmap {!   !} {!   !}
--- Strategie für CTL*: Die temporalen Operatoren sammeln die F an, und die Effektoperatoren fressen sie alle auf
--- Brauchen wir freie Monaden dafür?
-{-
-Quasi so:
-collect : FStream F A -> (Free F) (Stream A)
-Dann A oder E anwenden
-Wie dann in den F-Kontext zurückkehren?
-
-Oder A & E sind nur Dekorationen per newtype die später ausgewertet werden
--}
-
+open GA public
 
 record GE {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
     nowE : E (fmap head (inF cas))
     laterE : {j : Size< i} → EPred (GE {j}) (fmap {C = C} (λ as → tail {i} as) (inF cas))
+open GE public
 
-data FA {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
-  alreadyA : FA cas
+data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  alreadyA : A (fmap head (inF cas)) → FA cas
+  notYetA : APred FA (fmap (λ x → tail x) (inF cas)) → FA cas
+open FA
+
+data FE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  alreadyE : E (fmap head (inF cas)) → FE cas
+  notYetE : EPred FE (fmap (λ x → tail x) (inF cas)) → FE cas
+open FE
 
 {-
 ■A2 : {C : Container Level.zero} → (cas : FStream C Set) → Set
