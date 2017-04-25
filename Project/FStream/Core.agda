@@ -1,189 +1,115 @@
 module FStream.Core where
 
-open import ContainerMonkeyPatched
-open import Relation.Binary.PropositionalEquality
-open import Data.Nat hiding (_⊔_) public
-open import Data.Fin hiding (_+_)
-open import Data.Product hiding (map) public
-open import Data.Unit
-open import Level
+open import ContainerMonkeyPatched renaming (map to fmap)
+open import Data.Nat hiding (_⊔_)
+open import Data.Product hiding (map)
+open import Data.Vec using ([]; _∷_; Vec)
+open import Level hiding (suc) renaming (zero to ℓ₀)
+open import Size public
 
 mutual
-  record FStream {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+  record FStream {i : Size} {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+    -- random name
+    constructor F_
     inductive
     field
-      inF : ⟦ C ⟧ (FStream' C A)
-  record FStream' {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+      inF : ⟦ C ⟧ (FStream' {i} C A)
+  record FStream' {i : Size} {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+    -- semirandom name
+    constructor _▸_
     coinductive
     field
       head : A
-      tail : FStream C A
+      tail : {j : Size< i} → FStream {j} C A
 open FStream
 open FStream'
 
-ListC : Container Level.zero
-Shape    ListC   = ℕ
-Position ListC n = Fin n
+_►_ : ∀ {ℓ₁ ℓ₂ i} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream {i} C A → FStream {i} C A
+f ► (F inF) = F fmap (λ z → head z ▸ tail z) inF
 
---isoL1 : ⟦ ListC ⟧ A 'iso' List A
+mutual
+  map : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream {i} C A → FStream {i} C B
+  inF (map f as) = fmap (map' f) (inF as)
 
-eineListe : ⟦ ListC ⟧ ℕ
-proj₁ eineListe = 2
-proj₂ eineListe Fin.zero = 23
-proj₂ eineListe (Fin.suc Fin.zero) = 42
-proj₂ eineListe (Fin.suc (Fin.suc ()))
+  map' : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream' {i} C A → FStream' {i} C B
+  head (map' f as) = f (head as)
+  tail (map' f as) = map f (tail as)
 
-StateC : ∀ {ℓ} → Set ℓ → Container ℓ
-Shape (StateC S) = S -> S
-Position (StateC S) _ = S
+mutual
+  constantly : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream {i} C A
+  inF (constantly ca) = fmap (constantly' ca) ca
 
-ReaderC : Set → Container Level.zero
-Shape (ReaderC R) = ⊤
-Position (ReaderC R) _ = R
+  constantly' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → A → FStream' {i} C A
+  head (constantly' ca a) = a
+  tail (constantly' ca a) = constantly ca
 
-runReader : {R A : Set} → ⟦ ReaderC R ⟧ A → R → A
-runReader (proj₁ , proj₂) r = proj₂ r
-
-read : ∀ {R} → ⟦ ReaderC R ⟧ R
-proj₁ read = tt
-proj₂ read x = x
-
-record PosNat : Set where
-  constructor _because_
-  field
-    n   : ℕ
-    n>0 : n > 0
-
-drei : PosNat
-drei = 3 because s≤s z≤n
-
-readDouble : ⟦ ReaderC ℕ ⟧ ℕ
-readDouble = map (_* 2) read
-
-data even : ℕ → Set where
-  even_z : even 0
-  even_s : {n : ℕ} → even n → even (ℕ.suc (ℕ.suc n))
+repeat : {A : Set} → {C : Container ℓ₀} → ⟦ C ⟧ A -> FStream C A
+proj₁ (inF (repeat (proj₁ , proj₂))) = proj₁
+head (proj₂ (inF (repeat (proj₁ , proj₂))) x) = proj₂ x
+tail (proj₂ (inF (repeat (proj₁ , proj₂))) x) = repeat (proj₁ , proj₂)
 
 {-
-
--- one does not simply ignore ze kommutativity :)
-
-n*2lemma : {n : ℕ} → even n -> even (2 + n)
-n*2lemma p = even_s p
-
-n*2lemma_b : {n : ℕ} → even n -> even (n + 2)
-n*2lemma_b even_z = even even_z s
-n*2lemma_b even x s = even n*2lemma_b x s
-
--}
-
-n*2iseven : (n : ℕ) → even (n * 2)
-n*2iseven ℕ.zero = even_z
-n*2iseven (ℕ.suc n) = even n*2iseven n s
-
--- spass mit versehentlich implementiertem infix für Konstr. even_s 
-alwaysEven : (n : ℕ) → even (runReader readDouble n)
-alwaysEven ℕ.zero = even_z
-alwaysEven (ℕ.suc n) = even alwaysEven n s
-
-alwaysEvenC : □ even readDouble
-alwaysEvenC ℕ.zero = even_z
-alwaysEvenC (ℕ.suc p) = even alwaysEvenC p s
-
-readSuc : ⟦ ReaderC ℕ ⟧ ℕ
-readSuc = map (ℕ.suc) read
-
-alwaysPos : (n : ℕ) → runReader readSuc n > 0
-alwaysPos n = s≤s z≤n
-
-alwaysPosC : □ (_> 0) readSuc
-alwaysPosC = λ p → s≤s z≤n
-
-sometimes3 : ◇ (_≡ 3) readSuc
-sometimes3 = ℕ.suc (ℕ.suc ℕ.zero) , refl
-
-sometimes5 : ◇ (_≡ 5) readSuc
-sometimes5 = ℕ.suc (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero))) , refl
-
 repeat : {A : Set} → {C : Container Level.zero} → ⟦ C ⟧ A -> FStream C A
 proj₁ (FStream.inF (repeat (proj₁ , proj₂))) = proj₁
 FStream'.head (proj₂ (FStream.inF (repeat (proj₁ , proj₂))) x) = proj₂ x
 FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
+-}
 
--- ■ und ◆ stehen für die temporalen Modalitäten, A und E stehen für die Seiteneffekt-Modalitäten
+mutual
+  corec : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {X : Set ℓ₃} → (X → A × ⟦ C ⟧ X) → ⟦ C ⟧ X → FStream {i} C A
+  inF (corec f x) = fmap (corec' f) x
 
-record ■A {c ℓ₁ ℓ₂} {A : Set ℓ₁} {C : Container c} (pred : A → Set ℓ₂) (cas : FStream C A) : Set (c ⊔ ℓ₂) where
-  -- Zu jeder Zeit, bei jedem Seiteneffekt ist pred erfüllt
-  coinductive
-  field
-    nowA : APred {c} {ℓ₁} {ℓ₂} {C} {A} pred (map head (inF cas))
-    laterA : APred {c} {ℓ₁ ⊔ c} {ℓ₂ ⊔ c} {C} {FStream C A} (■A pred) (map tail (inF cas))
-open ■A
+  corec' : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {X : Set ℓ₃} → (X → A × ⟦ C ⟧ X) → X → FStream' {i} C A
+  head (corec' f x) = proj₁ (f x)
+  tail (corec' f x) = corec f (proj₂ (f x))
 
-data ◆E {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
-  -- Irgendwann könnte ein Seiteneffekt auftreten, sodass pred erfüllt ist
-  alreadyE : ◇ {Level.zero} {C} {A} pred (map head (inF cas)) → ◆E pred cas
-  notYetE : ◇ {Level.zero} {C} {FStream C A} (◆E pred) (map tail (inF cas)) → ◆E pred cas
-open ◆E
+infix 8 _▻_
+infixr 5 _▻'_
+infix 6 ⟨_▻⋯
+infix 7 _⟩
 
--- Jederzeit ist die Ausgabe von repeat readSuc positiv, egal welche Werte reinkommen
-always>0 : ■A (_> 0) (repeat readSuc)
-nowA always>0 p = s≤s z≤n
-laterA always>0 p = always>0
+data FVec {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : (n : ℕ) → Set (ℓ₁ ⊔ ℓ₂) where
+  FNil : FVec C A 0
+  FCons : ∀ {n} → ⟦ C ⟧ (A × FVec C A n) → FVec C A (suc n)
 
--- Summiert alle Werte in der Reader-Umgebung auf
-sumFrom : ℕ → FStream (ReaderC ℕ) ℕ
-proj₁ (inF (sumFrom n0)) = tt
-head (proj₂ (inF (sumFrom n0)) n) = n0 + n
-tail (proj₂ (inF (sumFrom n0)) n) = sumFrom (n0 + n)
+nest : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → Vec (⟦ C ⟧ A) n → FVec C A n
+nest [] = FNil
+nest (a ∷ as) = FCons (fmap (λ x → x , nest as) a)
 
-sum : FStream (ReaderC ℕ) ℕ
-sum = sumFrom 0
+_▻_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → A → ⟦ C ⟧ (FVec C A n) → FVec C A (suc n)
+a ▻ v = FCons (fmap (λ x → a , x) v)
+_▻'_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → ⟦ C ⟧ A → (FVec C A n) → FVec C A (suc n)
+a ▻' v = FCons (fmap (λ x → x , v) a)
 
--- Es ist möglich, dass irgendwann die Summe größer als 2 ist
-eventuallysometimes>2 : ◆E (_> 2) sum
-eventuallysometimes>2 = alreadyE (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
--- und zwar schon nach dem ersten Schritt, falls 3 als Eingabe kommt
+_⟩ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
+a ⟩ = a ▻' FNil
 
+mutual
+  take : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream C A → FVec C A n
+  take ℕ.zero as = FNil
+  take (ℕ.suc n) as = FCons (fmap (take' n) (inF as))
 
-record ■E {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
-  -- Jederzeit könnte ein Seiteneffekt auftreten, sodass pred erfüllt ist
-  coinductive
-  field
-    nowE : ◇ {Level.zero} {C} {A} pred (map head (inF cas))
-    laterE : ◇ {Level.zero} {C} {FStream C A} (■E pred) (map tail (inF cas))
-open ■E
+  take' : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream' C A → A × FVec C A n
+  proj₁ (take' n as) = head as
+  proj₂ (take' n as) = take n (tail as)
 
 
-data ◆A {A : Set} {C : Container Level.zero} (pred : A → Set) (cas : FStream C A) : Set where
-  -- Irgendwann ist ein Zeitpunkt erreicht, sodass unter jedem Seiteneffekt pred erfüllt wird
-  alreadyA : □ {Level.zero} {C} {A} pred (map head (inF cas)) → ◆A pred cas
-  notYetA : □ {Level.zero} {C} {FStream C A} (◆A pred) (map tail (inF cas)) → ◆A pred cas
-open ◆A
+⟨_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
+     → FVec C A (suc n) → FStream {i} C A
+⟨ as ▻⋯ = aux as FNil
+  where
+    mutual
+      aux : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
+           → FVec C A (suc n) → FVec C A m → FStream {i} C A
+      inF (aux (FCons x) FNil) = fmap (aux2 (FCons x)) x
+      inF (aux keep (FCons x)) = fmap (aux2 keep) x
+      aux2 : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
+        → FVec C A (suc n) → A × FVec C A m → FStream' {i} C A
+      head (aux2 keep (a , _)) = a
+      tail (aux2 keep (_ , v)) = aux keep v
 
--- Es ist jederzeit möglich, dass die Summe 2 übersteigt
-alwaysSomehow>2 : ■E (_> 2) sum
-nowE alwaysSomehow>2 = (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
-laterE alwaysSomehow>2 = 0 , alwaysSomehow>2
-
--- Es ist jederzeit möglich, dass die Summe n übersteigt
-alwaysSomehow>n : (n : ℕ) → ■E (_> n) sum
-nowE (alwaysSomehow>n  n) = ℕ.suc n , lem n
-  where lem : (n : ℕ) → ℕ.suc n > n  
-        lem ℕ.zero = s≤s z≤n
-        lem (ℕ.suc n) = s≤s (lem n)
-laterE (alwaysSomehow>n n) = 0 , alwaysSomehow>n n
-
-record ■A2 {C : Container Level.zero} (cas : FStream C Set) : Set where
-  coinductive
-  field
-    nowA2 : A (map head (inF cas))
-    laterA2 : APred ■A2 (map tail (inF cas)) -- ∀ moegliche tails -> APred *
-
-
-id : ∀ {ℓ} → Set ℓ → Set ℓ
-id x = x
 {-
-■A2 : {C : Container Level.zero} → (cas : FStream C Set) → Set
-■A2 cas = ■A id cas
+Stuff that doesn't obviously work:
+* drop, _at_ (Since side effects would have to be thrown away)
+* _▸⋯  (Only if the given value is effectful or the functor is pointed, i.e. has a null effect (like Applicative or Monad))
 -}
