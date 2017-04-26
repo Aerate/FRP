@@ -6,6 +6,7 @@ open import Data.Fin hiding (_+_)
 open import Level renaming (zero to ℓ₀)
 open import Data.Product hiding (map) public
 open import Data.Unit
+open import Data.Empty
 
 ListC : Container ℓ₀
 Shape    ListC   = ℕ
@@ -29,6 +30,22 @@ proj₂ read x = x
 returnReader : {R A : Set} → A → ⟦ ReaderC R ⟧ A
 returnReader a = tt , (λ _ → a)
 
+IdC : Container ℓ₀
+IdC = ⊤ ▷ (λ _ → ⊤)
+
+Id : Set → Set
+Id = ⟦ IdC ⟧
+
+id : ∀ {X} → X → Id X
+id x = tt , (λ _ → x)
+
+kC : Set → Container ℓ₀
+kC A = A ▷ (λ _ → ⊥)
+
+K : Set → Set → Set
+K A = ⟦ kC A ⟧
+
+-- just a tryout
 StreamC : Container ℓ₀
 Shape StreamC = ⊤
 Position StreamC _ = ℕ

@@ -67,6 +67,12 @@ record GA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) 
     laterA : APred (GA) (fmap (λ as → tail as) (inF cas))
 open GA public
 
+record GA' {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  inductive
+  field
+    nowA : head props
+    laterA : A (fmap GA' (inF (tail props)))
+
 record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
