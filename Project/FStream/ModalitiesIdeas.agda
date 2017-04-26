@@ -9,9 +9,13 @@ open import Level
 open import Function
 
 
-GAₛ : ∀ {i} {A B : Set} (C : Container) → FStream {i} C A → FStream {i} C B
-proj₁ (inF (GAₛ (Shape ▷ Position) x)) = {!!}
-proj₂ (inF (GAₛ C x)) = {!!}
+--GAₛ : ∀ {i} {A B : Set} (C : Container) → FStream {i} C A → FStream {i} C B
+--proj₁ (inF (GAₛ (Shape ▷ Position) x)) = {!!}
+--proj₂ (inF (GAₛ C x)) = {!!}
+
+GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (GAₛ' props) = GA' props
+inF (tail (GAₛ' props)) = fmap GAₛ' (inF (tail props))
 
 -- GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
 -- head (GAₛ' cas) = GA cas
