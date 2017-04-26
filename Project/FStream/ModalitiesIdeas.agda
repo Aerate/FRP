@@ -21,9 +21,9 @@ inF (tail (GAₛ' props)) = fmap GAₛ' (inF (tail props))
 -- head (GAₛ' cas) = GA cas
 -- inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
 
--- Aₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
--- head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
--- inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
+Aₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
+inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
 
 
 -- Gₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
