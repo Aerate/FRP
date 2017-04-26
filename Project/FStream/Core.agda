@@ -10,7 +10,7 @@ open import Size public
 mutual
   record FStream {i : Size} {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
     -- random name
-    constructor F_
+    --constructor F_
     inductive
     field
       inF : ⟦ C ⟧ (FStream' {i} C A)
@@ -21,11 +21,13 @@ mutual
     field
       head : A
       tail : {j : Size< i} → FStream {j} C A
-open FStream
-open FStream'
+open FStream public
+open FStream' public
 
 _►_ : ∀ {ℓ₁ ℓ₂ i} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream {i} C A → FStream {i} C A
-f ► (F inF) = F fmap (λ z → head z ▸ tail z) inF
+--f ► (F inF) = F fmap (λ z → head z ▸ tail z) inF
+f ► record { inF = inf } = record { inF = fmap ((λ z → head z ▸ tail z)) inf }
+
 
 mutual
   map : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream {i} C A → FStream {i} C B
