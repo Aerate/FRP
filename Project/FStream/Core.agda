@@ -24,6 +24,8 @@ mutual
 open FStream public
 open FStream' public
 
+
+--TODO size-complaints in v2.5.1 (fine in 2.6.0)
 _►_ : ∀ {ℓ₁ ℓ₂ i} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream {i} C A → FStream {i} C A
 --f ► (F inF) = F fmap (λ z → head z ▸ tail z) inF
 f ► record { inF = inf } = record { inF = fmap ((λ z → head z ▸ tail z)) inf }
@@ -49,13 +51,6 @@ repeat : {A : Set} → {C : Container ℓ₀} → ⟦ C ⟧ A -> FStream C A
 proj₁ (inF (repeat (proj₁ , proj₂))) = proj₁
 head (proj₂ (inF (repeat (proj₁ , proj₂))) x) = proj₂ x
 tail (proj₂ (inF (repeat (proj₁ , proj₂))) x) = repeat (proj₁ , proj₂)
-
-{-
-repeat : {A : Set} → {C : Container Level.zero} → ⟦ C ⟧ A -> FStream C A
-proj₁ (FStream.inF (repeat (proj₁ , proj₂))) = proj₁
-FStream'.head (proj₂ (FStream.inF (repeat (proj₁ , proj₂))) x) = proj₂ x
-FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
--}
 
 mutual
   corec : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {X : Set ℓ₃} → (X → A × ⟦ C ⟧ X) → ⟦ C ⟧ X → FStream {i} C A
