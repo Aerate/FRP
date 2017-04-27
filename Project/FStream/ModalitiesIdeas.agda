@@ -2,7 +2,6 @@ module FStream.ModalitiesIdeas where
 
 open import FStream.Core
 open import FStream.Modalities
-open import ContainerMonkeyPatched renaming (map to fmap)
 open import Data.Product
 
 open import Level
@@ -17,14 +16,22 @@ GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set �
 head (GAₛ' props) = GA' props
 inF (tail (GAₛ' props)) = fmap GAₛ' (inF (tail props))
 
+FAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (FAₛ' x) =  FA' x
+inF (tail (FAₛ' x)) = fmap FAₛ' (inF (tail x))
+
 -- GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
 -- head (GAₛ' cas) = GA cas
 -- inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
 
+--TODO : Naming-Convention
 Aₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
 head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
 inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
 
+Eₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (Eₛ {i} {ℓ₁} {ℓ₂} {C} cas) = E {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
+inF (tail (Eₛ cas)) = fmap (Eₛ ∘ (λ as → tail as)) (inF cas)
 
 -- Gₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
 -- inF (Gₛ cas) = fmap {!   !} {!   !}

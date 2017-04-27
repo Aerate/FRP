@@ -1,6 +1,5 @@
 module FStream.ModalityExamples where
 
-open import ContainerMonkeyPatched renaming (map to fmap)
 open import Data.Nat
 open import FStream.Containers
 open import FStream.Core

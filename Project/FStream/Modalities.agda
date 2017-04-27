@@ -1,9 +1,6 @@
 module FStream.Modalities where
 
-open import ContainerMonkeyPatched renaming (map to fmap)
 open import FStream.Core public
-open FStream public
-open FStream' public
 
 open import Data.Nat hiding (_⊔_)
 open import Data.Fin hiding (_+_)
@@ -67,18 +64,14 @@ record GA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) 
     laterA : APred (GA) (fmap (λ as → tail as) (inF cas))
 open GA public
 
---record GA' {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
---  inductive
---  field
---    nowA : head props
---    laterA : A (fmap GA' (inF (tail props)))
-
 record GA' {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   inductive
   field
-    nowA : head props
-    laterA : {j : Size< i} → A (fmap GA' (inF (tail props)))
+    nowA' : head props
+    laterA' : {j : Size< i} → A (fmap GA' (inF (tail props)))
+open GA' public
 
+--TODO-Seb: GE'
 record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
@@ -86,11 +79,18 @@ record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) 
     laterE : EPred (GE) (fmap {C = C} (λ as → tail as) (inF cas))
 open GE public
 
+--TODO-Seb: FA'
 data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA : A (fmap head (inF cas)) → FA cas
   notYetA : APred FA (fmap (λ x → tail x) (inF cas)) → FA cas
 open FA
 
+data FA' {ℓ₁ ℓ₂} {i : Size} {C : Container ℓ₁} (cas : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  alreadyA : head cas → FA' cas
+  notYetA :  {j : Size< i} →  A (fmap GA' (inF (tail cas))) → FA' cas
+open FA'
+
+--TODO-Seb: FE'
 data FE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyE : E (fmap head (inF cas)) → FE cas
   notYetE : EPred FE (fmap (λ x → tail x) (inF cas)) → FE cas

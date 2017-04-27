@@ -1,10 +1,10 @@
 module FStream.Core where
 
-open import ContainerMonkeyPatched renaming (map to fmap)
+open import ContainerMonkeyPatched renaming (map to fmap) public
 open import Data.Nat hiding (_⊔_)
 open import Data.Product hiding (map)
 open import Data.Vec using ([]; _∷_; Vec)
-open import Level hiding (suc) renaming (zero to ℓ₀)
+open import Level hiding (suc) renaming (zero to ℓ₀) public
 open import Size public
 
 mutual
