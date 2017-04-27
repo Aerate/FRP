@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+open import ContainerMonkeyPatched renaming (map to fmap)
+open import FStream.Core
+open import FStream.Containers
+open import FStream.ModalityExamples
+
+open import Data.Nat hiding (_⊔_)
+open import Data.Fin hiding (_+_)
+
+module FStream.Notes where
+>>>>>>> master
 
 eineListe : ⟦ ListC ⟧ ℕ
 proj₁ eineListe = 2

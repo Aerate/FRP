@@ -1,27 +1,33 @@
 module FStream.Core where
 
-open import ContainerMonkeyPatched renaming (map to fmap)
+open import ContainerMonkeyPatched renaming (map to fmap) public
 open import Data.Nat hiding (_⊔_)
 open import Data.Product hiding (map)
 open import Data.Vec using ([]; _∷_; Vec)
-open import Level hiding (suc)
+open import Level hiding (suc) renaming (zero to ℓ₀) public
 open import Size public
 
 mutual
   record FStream {i : Size} {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+    -- random name
+    --constructor F_
     inductive
     field
       inF : ⟦ C ⟧ (FStream' {i} C A)
   record FStream' {i : Size} {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : Set (ℓ₁ ⊔ ℓ₂) where
+    -- semirandom name
+    constructor _▸_
     coinductive
     field
       head : A
       tail : {j : Size< i} → FStream {j} C A
-open FStream
-open FStream'
+open FStream public
+open FStream' public
 
+-- TODO Not a good idea to have two similar looking triangles
 _►_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream C A → FStream C A
 inF (a ► as) = fmap (λ x → record { head = x ; tail = as }) a
+-- f ► record { inF = inf } = record { inF = fmap ((λ z → head z ▸ tail z)) inf } -- Sebastian's solution
 
 mutual
   -- Caution, this one pushes the side effects down one tick
@@ -38,6 +44,9 @@ a ►⋯' = a ►' (a ►⋯')
 -}
 -- TODO Write the above without the direct recursion
 
+
+
+
 mutual
   map : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream {i} C A → FStream {i} C B
   inF (map f as) = fmap (map' f) (inF as)
@@ -45,7 +54,6 @@ mutual
   map' : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} → (A → B) → FStream' {i} C A → FStream' {i} C B
   head (map' f as) = f (head as)
   tail (map' f as) = map f (tail as)
-
 
 mutual
   constantly : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FStream {i} C A
@@ -55,13 +63,10 @@ mutual
   head (constantly' ca a) = a
   tail (constantly' ca a) = constantly ca
 
-
-{-
-repeat : {A : Set} → {C : Container Level.zero} → ⟦ C ⟧ A -> FStream C A
-proj₁ (FStream.inF (repeat (proj₁ , proj₂))) = proj₁
-FStream'.head (proj₂ (FStream.inF (repeat (proj₁ , proj₂))) x) = proj₂ x
-FStream'.tail (proj₂ (FStream.inF (repeat ca)) x) = repeat ca
--}
+repeat : {A : Set} → {C : Container ℓ₀} → ⟦ C ⟧ A -> FStream C A
+proj₁ (inF (repeat (proj₁ , proj₂))) = proj₁
+head (proj₂ (inF (repeat (proj₁ , proj₂))) x) = proj₂ x
+tail (proj₂ (inF (repeat (proj₁ , proj₂))) x) = repeat (proj₁ , proj₂)
 
 mutual
   corec : ∀ {i ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {X : Set ℓ₃} → (X → A × ⟦ C ⟧ X) → ⟦ C ⟧ X → FStream {i} C A
@@ -91,6 +96,7 @@ a ▻' v = FCons (fmap (λ x → x , v) a)
 
 _⟩ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
 a ⟩ = a ▻' FNil
+
 
 mutual
   take : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream C A → FVec C A n
