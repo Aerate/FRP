@@ -23,6 +23,23 @@ inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
 Gₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
 inF (Gₛ cas) = fmap {!   !} {!   !}
 
+mutual
+  FAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+  head (FAₛ' props) = FA {!   !} -- props
+  inF (tail (FAₛ' props)) = fmap FAₛ' (fmap (λ x → tail x) (inF props))
+  FAₛ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream  C (Set ℓ₂) → FStream C (Set (ℓ₁ ⊔ ℓ₂))
+  FAₛ = {!   !}
+
+FAₛ'' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (FAₛ'' {i} props) = FA' {! props  !} -- props
+inF (tail (FAₛ'' props)) = fmap FAₛ'' (inF (tail props))
+
+GAₛ'' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+GAₛ'' props = ?
+
+--TODO Try GAₛ maybe?
+--TODO Think about the semantics and implement it from there
+
 -- Strategie für CTL*: Die temporalen Operatoren sammeln die F an, und die Effektoperatoren fressen sie alle auf
 -- Brauchen wir freie Monaden dafür?
 {-
