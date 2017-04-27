@@ -64,8 +64,21 @@ record GA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) 
   coinductive
   field
     nowA : A (fmap head (inF cas))
-    laterA : APred (GA) (fmap (λ as → tail as) (inF cas))
+    laterA : APred GA (fmap (λ as → tail as) (inF cas))
 open GA public
+
+record GA' {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream' C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  coinductive
+  field
+    nowA' : head cas
+    laterA' : A (fmap GA' (inF (tail cas)))
+
+{-
+record test {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream' C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  inductive
+  field
+    testfield : A (fmap test (inF (tail cas)))
+-}
 
 record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
@@ -77,7 +90,18 @@ open GE public
 data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA : A (fmap head (inF cas)) → FA cas
   notYetA : APred FA (fmap (λ x → tail x) (inF cas)) → FA cas
-open FA
+
+-- TODO From a CTL viewpoint, it makes much more sense that the modalities act on FStream',
+-- since in the semantics, the first world is already given
+data FA' {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream' C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  -- alreadyA' : head cas → FA' cas
+  notYetA' : A (fmap FA' (inF (tail cas))) → FA' cas
+
+data FASized {i ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  alreadyASized : A (fmap head (inF cas)) → FASized cas
+  notYetASized : ∀ {j : Size< i} → APred FASized (fmap (λ x → tail x) (inF cas)) → FASized cas
+open FASized
+
 
 data FE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyE : E (fmap head (inF cas)) → FE cas
