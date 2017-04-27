@@ -218,8 +218,8 @@ open _⊸_ public using (shape⊸; position⊸; ⟪_⟫⊸)
 
 -- All.
 
-□ : ∀ {c} {C : Container c} {X : Set c} →
-    (X → Set c) → (⟦ C ⟧ X → Set c)
+□ : ∀ {c ℓ} {C : Container c} {X : Set ℓ} →
+    (X → Set ℓ) → (⟦ C ⟧ X → Set (c ⊔ ℓ))
 □ P (s , f) = ∀ p → P (f p)
 
 □-map : ∀ {c} {C : Container c} {X : Set c} {P Q : X → Set c} →
