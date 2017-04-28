@@ -39,8 +39,10 @@ head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF 
 inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
 
 -- TODO The following is a crazy idea
+{-
 Gₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
 inF (Gₛ cas) = fmap {!   !} {!   !}
+
 
 mutual
   FAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
@@ -49,12 +51,14 @@ mutual
   FAₛ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream  C (Set ℓ₂) → FStream C (Set (ℓ₁ ⊔ ℓ₂))
   FAₛ = {!   !}
 
+
 FAₛ'' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
 head (FAₛ'' {i} props) = FA' {! props  !} -- props
 inF (tail (FAₛ'' props)) = fmap FAₛ'' (inF (tail props))
 
 GAₛ'' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
-GAₛ'' props = ?
+GAₛ'' props = {!   !}
+-}
 
 --TODO Try GAₛ maybe?
 --TODO Think about the semantics and implement it from there
