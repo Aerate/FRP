@@ -29,6 +29,10 @@ FAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set �
 head (FAₛ' x) =  FA' x
 inF (tail (FAₛ' x)) = fmap FAₛ' (inF (tail x))
 
+FEₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream' {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
+head (FEₛ' x) =  FE' x
+inF (tail (FEₛ' x)) = fmap FEₛ' (inF (tail x))
+
 -- GAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
 -- head (GAₛ' cas) = GA cas
 -- inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
