@@ -41,11 +41,15 @@ isLive₂ : FE (map (_≡ true) boolLight₂)
 isLive₂ = notYetE (true , (notYetE (true , (alreadyE (false , refl)))))
 
 
-trafficLight₃ : FStream (ReaderC Bool) Colour
+trafficLight₃ : ∀ {i} → FStream {i} (ReaderC Bool) Colour
 trafficLight₃ = ⟨ returnReader green ▻' (boolToColour <$> read) ▻' returnReader red ▻' returnReader green ⟩ ▻⋯
 boolLight₃ : FStream (ReaderC Bool) Bool
 boolLight₃ = ⟨ returnReader true ▻' returnReader false ▻' returnReader true ⟩ ▻⋯
 
 -- TODO: Check FAₛ implementation since only the 'AlreadyA'-Constructor seems to work
-isLive₃ : head (GAₛ' (FAₛ' (Aₛ (map (_≡ green) trafficLight₃))))
-isLive₃ = {!!}
+isLive₃ : ∀ {i} → head (GAₛ' {i} (FAₛ' {i} (Aₛ {i} (map (_≡ green) (trafficLight₃ {i})))))
+nowA' isLive₃ = alreadyA (λ p → refl)
+nowA' (laterA' isLive₃ {j} p) = {!   !}
+nowA' (laterA' (laterA' isLive₃ p₁) p₂) = {!   !}
+nowA' (laterA' (laterA' (laterA' isLive₃ p₁) p₂) p) = {!   !}
+laterA' (laterA' (laterA' (laterA' isLive₃ p₁) p₂) p) {j} p₃ = isLive₃
