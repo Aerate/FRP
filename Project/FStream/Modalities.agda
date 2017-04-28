@@ -83,7 +83,6 @@ open GE public
 
 -- TODO From a CTL viewpoint, it makes much more sense that the modalities act on FStream',
 -- since in the semantics, the first world is already given
---TODO-Seb: FA'
 data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA : A (fmap head (inF cas)) → FA cas
   notYetA : APred FA (fmap (λ x → tail x) (inF cas)) → FA cas
@@ -91,10 +90,14 @@ open FA
 
 data FA' {ℓ₁ ℓ₂} {i : Size} {C : Container ℓ₁} (cas : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA : head cas → FA' cas
-  notYetA :  {j : Size< i} →  A (fmap GA' (inF (tail cas))) → FA' cas
+  notYetA :  {j : Size< i} →  A (fmap FA' (inF (tail cas))) → FA' cas
 open FA'
 
---TODO-Seb: FE'
+data FE' {ℓ₁ ℓ₂} {i : Size} {C : Container ℓ₁} (cas : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  alreadyE : head cas → FE' cas
+  notYetE :  {j : Size< i} →  E (fmap FE' (inF (tail cas))) → FE' cas
+open FE'
+
 data FE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyE : E (fmap head (inF cas)) → FE cas
   notYetE : EPred FE (fmap (λ x → tail x) (inF cas)) → FE cas
