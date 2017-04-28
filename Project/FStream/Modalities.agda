@@ -64,6 +64,8 @@ record GA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) 
     laterA : APred GA (fmap (λ as → tail as) (inF cas))
 open GA public
 
+-- TODO Positivity is checked correctly in agda 2.6
+{-# NO_POSITIVITY_CHECK #-}
 record GA' {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
