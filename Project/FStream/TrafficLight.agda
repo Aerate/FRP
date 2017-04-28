@@ -2,6 +2,7 @@ module FStream.TrafficLight where
 
 open import Data.Bool
 open import Data.Empty
+open import Data.Unit
 
 open import FStream.Core
 open import FStream.Containers
@@ -53,3 +54,31 @@ nowA' (laterA' isLive₃ {j} p) = {!   !}
 nowA' (laterA' (laterA' isLive₃ p₁) p₂) = {!   !}
 nowA' (laterA' (laterA' (laterA' isLive₃ p₁) p₂) p) = {!   !}
 laterA' (laterA' (laterA' (laterA' isLive₃ p₁) p₂) p) {j} p₃ = isLive₃
+
+
+mutual
+  -- This fellow switches between false and true every time a "true" is entered as input
+  trueEgde : ∀ {i} → FStream {i} (ReaderC Bool) Bool
+  proj₁ (inF trueEgde) = tt
+  head (proj₂ (inF trueEgde) true) = false
+  tail (proj₂ (inF trueEgde) true) = falseEgde
+  head (proj₂ (inF trueEgde) false) = true
+  tail (proj₂ (inF trueEgde) false) = trueEgde
+  falseEgde : ∀ {i} → FStream {i} (ReaderC Bool) Bool
+  proj₁ (inF falseEgde) = tt
+  head (proj₂ (inF falseEgde) true) = true
+  tail (proj₂ (inF falseEgde) true) = trueEgde
+  head (proj₂ (inF falseEgde) false) = false
+  tail (proj₂ (inF falseEgde) false) = falseEgde
+
+-- At every point in time, it is possible (by correct input) to output true
+-- TODO Not sure whether Aₛ is called for here
+mutual
+  edgeResponsive : ∀ {i} → head (GAₛ' {i} (FEₛ' {i} (Eₛ {i} (map {i} (_≡ true) (trueEgde {i})))))
+  nowA' edgeResponsive = alreadyE (false , refl)
+  laterA' edgeResponsive false = edgeResponsive
+  laterA' edgeResponsive true = edgeResponsive'
+  edgeResponsive' : ∀ {i} → head (GAₛ' {i} (FEₛ' {i} (Eₛ {i} (map {i} (_≡ true) (falseEgde {i})))))
+  nowA' edgeResponsive' = alreadyE (true , refl)
+  laterA' edgeResponsive' false = edgeResponsive'
+  laterA' edgeResponsive' true = edgeResponsive
