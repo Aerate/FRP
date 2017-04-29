@@ -105,7 +105,7 @@ tl ([] ∷⟨ (v ▸ vs) ▸⋯) = vs ∷⟨ (v ▸ vs) ▸⋯
 ⟨ xs ▸⋯ = [] ∷⟨ xs ▸⋯
 
 -- allows for sugaring a vector in combination with cycle
-_⟩ : ∀ {A : Set} → A → Vec A 1
+_⟩ : ∀ {a} {A : Set a} → A → Vec A 1
 a ⟩ = a ▸ []
 
 
