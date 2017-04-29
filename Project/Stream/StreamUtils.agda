@@ -12,8 +12,8 @@ open import Function
 
 open import Stream.Stream
 
-infix 6 ⟨_▸⋯ 
-infix 7 _⟩ 
+infix 6 ⟨_▸⋯
+infix 7 _⟩
 
 ---------------------------------------------------
 -- Functor and applicative instance
@@ -31,7 +31,7 @@ record Functor (F : Set → Set) : Set₁ where
 open Functor {{...}} public
 
 record Applicative (F : Set → Set) : Set₁ where
-  infixl 2 _✴_ 
+  infixl 2 _✴_
   field
     pure : ∀ {X} → X → F X
     _✴_  : ∀ {X A} → F (X → A) → F X → F A
@@ -46,11 +46,11 @@ FunctorStream : Functor (λ X → Stream X)
 FunctorStream = record { fmap = map }
 
 ---------------------------
--- Function lifting 
+-- Function lifting
 ---------------------------
 
 -- nullary
-lift0 = _▸⋯ 
+lift0 = _▸⋯
 
 -- unary
 lift1 = map
@@ -86,13 +86,13 @@ takeUntil {A = A} s (there any) = hd s ∷ (proj₁ p) , proj₂ p
 -- Aliases
 ---------------------------
 
-repeat = _▸⋯ 
+repeat = _▸⋯
 
 ---------------------------
 -- Helpers
 ---------------------------
 
--- repeat a given vector (alias cycle) 
+-- repeat a given vector (alias cycle)
 ⟨_▸⋯ : ∀ {a n} {A : Set a} → Vec A (suc n) → Stream A
 ⟨ xs ▸⋯ = aux xs []
   where aux : ∀ {a n m} {A : Set a} → Vec A (suc n) → Vec A m → Stream A
@@ -102,6 +102,5 @@ repeat = _▸⋯
         tl (aux (v ▸ vs) []) = aux (v ▸ vs) vs
 
 -- allows for sugaring a vector in combination with cycle
-_⟩ : ∀ {A : Set} → A → Vec A 1 
+_⟩ : ∀ {A : Set} → A → Vec A 1
 a ⟩ = a ▸ []
-
