@@ -104,3 +104,9 @@ repeat = _▸⋯
 -- allows for sugaring a vector in combination with cycle
 _⟩ : ∀ {A : Set} → A → Vec A 1
 a ⟩ = a ▸ []
+
+
+-- prefix a vector to a stream
+_prefix_ : ∀ {a n} {A : Set a} → Vec A n → Stream A → Stream A
+[] prefix as = as
+(x ▸ v) prefix as = x ▸ (v prefix as)
