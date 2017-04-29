@@ -15,32 +15,15 @@ open □proof
 
 -- TODO Find out how to write the following with sizes
 {-# NON_TERMINATING #-}
-□prove : ∀ {n} → {props : Vec Set (suc n)} → □proof props → □ ⟨ props ▸⋯
-□prove {n0} {props0} proofs0 = □aux props0 [] proofs0 □nil
+_pre□cycle_ : ∀ {m n} → {props : Vec Set m} → {props' : Vec Set (suc n)} → □proof props → □proof props' → □ (props ∷⟨ props' ▸⋯)
+□-now (□nil pre□cycle (proof □cons proofs)) = proof
+□-later (□nil pre□cycle (proof □cons proofs)) = lemma (proofs pre□cycle (proof □cons proofs))
   where
-    lemma1 : ∀ {i : Size} {n} → (prop : Set) → (props : Vec Set n) → □ (props prefix ⟨ (prop ▸ props) ▸⋯) → □ (tl ([] prefix ⟨ prop ▸ props ▸⋯))
-    □-now (lemma1 prop [] x) = □-now x
-    □-now (lemma1 prop (prop' ▸ props) x) = □-now x
-    □-later (lemma1 prop [] x) = □-later x
-    □-later (lemma1 prop (prop' ▸ props) x) = □-later (lemma1 prop (prop' ▸ props) x)
-    □aux : ∀ {n m} → (props : Vec Set (suc n)) → (props' : Vec Set m) → □proof props → □proof props' → □ (props' prefix ⟨ props ▸⋯)
-    □-now (□aux (prop ∷ props) [] (proof □cons proofs) □nil) = proof
-    □-later (□aux {n} {m} (prop ∷ props) [] (proof □cons proofs) □nil) = lemma1 prop props (□aux (prop ▸ props) props (proof □cons proofs) proofs)
-    □-now (□aux props (x ∷ props') proofs (proof □cons proofs')) = proof
-    □-later (□aux props (x ∷ props') proofs (proof □cons proofs')) = □aux props props' proofs proofs'
+    lemma : ∀ {n} → {prop : Set} → {props : Vec Set n} → □ (props ∷⟨ (prop ▸ props) ▸⋯) → □ (tl ([] ∷⟨ (prop ▸ props) ▸⋯))
+    □-now (lemma x) = □-now x
+    □-later (lemma x) = □-later (lemma x)
+□-now ((proof □cons proofs) pre□cycle proofs') = proof
+□-later ((proof □cons proofs) pre□cycle proofs') = proofs pre□cycle proofs'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---
+□cycle : ∀ {n} → {props : Vec Set (suc n)} → □proof props → □ ⟨ props ▸⋯
+□cycle proofs = □nil pre□cycle proofs

@@ -92,14 +92,17 @@ repeat = _▸⋯
 -- Helpers
 ---------------------------
 
--- repeat a given vector (alias cycle)
+-- repeat a given vector, with prefix
+_∷⟨_▸⋯ : ∀ {a n m} {A : Set a} → Vec A m → Vec A (suc n) → Stream A
+hd ((x ▸ count) ∷⟨ keep ▸⋯ ) = x
+tl ((x ▸ count) ∷⟨ keep ▸⋯ ) = count ∷⟨ keep ▸⋯
+hd ([] ∷⟨ (v ▸ vs) ▸⋯) = v
+tl ([] ∷⟨ (v ▸ vs) ▸⋯) = vs ∷⟨ (v ▸ vs) ▸⋯
+
+
+-- repeat a given vector (alias cycle), without prefix
 ⟨_▸⋯ : ∀ {a n} {A : Set a} → Vec A (suc n) → Stream A
-⟨ xs ▸⋯ = aux xs []
-  where aux : ∀ {a n m} {A : Set a} → Vec A (suc n) → Vec A m → Stream A
-        hd (aux keep (x ▸ count)) = x
-        tl (aux keep (x ▸ count)) = aux keep count
-        hd (aux (v ▸ vs) []) = v
-        tl (aux (v ▸ vs) []) = aux (v ▸ vs) vs
+⟨ xs ▸⋯ = [] ∷⟨ xs ▸⋯
 
 -- allows for sugaring a vector in combination with cycle
 _⟩ : ∀ {A : Set} → A → Vec A 1
