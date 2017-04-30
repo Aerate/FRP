@@ -10,9 +10,9 @@ open import RSet.Globally
 open import RSet.Globally.Proof
 open import RSet.Properties.Reasoning
 
--- sugaring equality 
+-- sugaring equality
 
-_isEqual_ : {A : Set} → A → A → Set 
+_isEqual_ : {A : Set} → A → A → Set
 _isEqual_ = _≡_
 
 -- the trivial truth allows a recursive call for the '□-later' copattern

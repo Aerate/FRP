@@ -76,8 +76,7 @@ mutual
   head (corec' f x) = proj₁ (f x)
   tail (corec' f x) = corec f (proj₂ (f x))
 
-infix 8 _▻_
-infixr 5 _▻'_
+infixr 5 _▻_
 infix 6 ⟨_▻⋯
 infix 7 _⟩
 
@@ -85,17 +84,30 @@ data FVec {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : (n : ℕ) �
   FNil : FVec C A 0
   FCons : ∀ {n} → ⟦ C ⟧ (A × FVec C A n) → FVec C A (suc n)
 
+-- TODO Syntactic sugar for these as well
+data FVec' {ℓ₁ ℓ₂} (C : Container ℓ₁) (A : Set ℓ₂) : (n : ℕ) → Set (ℓ₁ ⊔ ℓ₂) where
+  FNil' : FVec' C A 0
+  FCons' : ∀ {n} → A → ⟦ C ⟧ (FVec' C A n) → FVec' C A (suc n)
+
+_▻'_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → A → ⟦ C ⟧ (FVec' C A n) → FVec' C A (suc n)
+_▻'_ = FCons'
+
+
+fVec'ToFVec : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → FVec' C A n → FVec C A n
+fVec'ToFVec FNil' = FNil
+fVec'ToFVec (FCons' a v) = FCons (fmap (λ x → a , fVec'ToFVec x) v)
+
+
 nest : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → Vec (⟦ C ⟧ A) n → FVec C A n
 nest [] = FNil
-nest (a ∷ as) = FCons (fmap (λ x → x , nest as) a)
+nest (a ∷ as) = FCons (fmap (λ x → (x , nest as)) a)
 
-_▻_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → A → ⟦ C ⟧ (FVec C A n) → FVec C A (suc n)
-a ▻ v = FCons (fmap (λ x → a , x) v)
-_▻'_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → ⟦ C ⟧ A → (FVec C A n) → FVec C A (suc n)
-a ▻' v = FCons (fmap (λ x → x , v) a)
+
+_▻_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → ⟦ C ⟧ A → (FVec C A n) → FVec C A (suc n)
+a ▻ v = FCons (fmap (λ x → x , v) a)
 
 _⟩ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
-a ⟩ = a ▻' FNil
+a ⟩ = a ▻ FNil
 
 
 mutual
@@ -107,23 +119,43 @@ mutual
   proj₁ (take' n as) = head as
   proj₂ (take' n as) = take n (tail as)
 
+take'' : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream' C A → FVec' C A n
+take'' zero as = FNil'
+take'' (suc n) as = FCons' (head as) (fmap (take'' n) (inF (tail as)))
+
+_pre⟨_▻⋯' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {m n}
+     → FVec' C A m → FVec' C A (suc n) → FStream' {i} C A
+head (FNil' pre⟨ FCons' a _ ▻⋯') = a
+inF (tail (FNil' pre⟨ FCons' a v ▻⋯')) = fmap (_pre⟨ (FCons' a v) ▻⋯') v
+head (FCons' x _ pre⟨ v' ▻⋯') = x
+inF (tail (FCons' _ v pre⟨ v' ▻⋯')) = fmap (_pre⟨ v' ▻⋯') v
+
+
+
+⟨_▻⋯' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
+     → FVec' C A (suc n) → FStream' {i} C A
+⟨ v ▻⋯' = FNil' pre⟨ v ▻⋯'
+
+
+mutual
+  _pre⟨_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {m n}
+       → FVec C A m → FVec C A (suc n) → FStream {i} C A
+  inF (FCons x pre⟨ keep ▻⋯) = fmap (_aux keep) x
+  inF (FNil pre⟨ FCons x ▻⋯) = fmap (_aux (FCons x)) x
+  _aux_ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
+    → A × FVec C A m → FVec C A (suc n) → FStream' {i} C A
+  head ((a , _ ) aux v) = a
+  tail ((_ , v') aux v) = v' pre⟨ v ▻⋯
 
 ⟨_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
      → FVec C A (suc n) → FStream {i} C A
-⟨ as ▻⋯ = aux as FNil
+⟨ as ▻⋯ = FNil pre⟨ as ▻⋯
   where
-    mutual
-      aux : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
-           → FVec C A (suc n) → FVec C A m → FStream {i} C A
-      inF (aux (FCons x) FNil) = fmap (aux2 (FCons x)) x
-      inF (aux keep (FCons x)) = fmap (aux2 keep) x
-      aux2 : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n m : ℕ}
-        → FVec C A (suc n) → A × FVec C A m → FStream' {i} C A
-      head (aux2 keep (a , _)) = a
-      tail (aux2 keep (_ , v)) = aux keep v
+
 
 {-
 Stuff that doesn't obviously work:
 * drop, _at_ (Since side effects would have to be thrown away)
-* _▸⋯  (Only if the given value is effectful or the functor is pointed, i.e. has a null effect (like Applicative or Monad))
+  (One could at most delay the side effects somehow?)
+* _▸⋯  (Only if the given value is effectful or the functor is pointed, i.e. has a null effect (like Applicative or Monad), or by delaying the side effects)
 -}

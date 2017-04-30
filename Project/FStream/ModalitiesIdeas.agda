@@ -2,9 +2,10 @@ module FStream.ModalitiesIdeas where
 
 open import FStream.Core
 open import FStream.Modalities
+
 open import Data.Product
-open import Level
 open import Function
+open import Level
 
 
 -- GAₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream {i} C (Set (ℓ₁ ⊔ ℓ₂))
@@ -37,10 +38,6 @@ inF (tail (FEₛ' x)) = fmap FEₛ' (inF (tail x))
 -- head (GAₛ' cas) = GA cas
 -- inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
 
---TODO : Naming-Convention
-Aₛ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
-head (Aₛ {i} {ℓ₁} {ℓ₂} {C} cas) = A {ℓ₁} {ℓ₂} (fmap head (inF {i} cas))
-inF (tail (Aₛ cas)) = fmap (Aₛ ∘ (λ as → tail as)) (inF cas)
 
 -- TODO The following is a crazy idea
 {-
