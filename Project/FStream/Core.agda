@@ -100,7 +100,7 @@ fVec'ToFVec (FCons' a v) = FCons (fmap (λ x → a , fVec'ToFVec x) v)
 
 nest : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → Vec (⟦ C ⟧ A) n → FVec C A n
 nest [] = FNil
-nest (a ∷ as) = FCons (fmap (λ x → (x , nest as)) a)
+nest (a ∷ as) = FCons (fmap (_, nest as) a)
 
 
 _▻_ :  ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n} → ⟦ C ⟧ A → (FVec C A n) → FVec C A (suc n)
@@ -109,6 +109,13 @@ a ▻ v = FCons (fmap (λ x → x , v) a)
 _⟩ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → ⟦ C ⟧ A → FVec C A 1
 a ⟩ = a ▻ FNil
 
+mutual
+  vmap : ∀ {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} {n} → (f : A → B) → FVec C A n → FVec C B n
+  vmap _ FNil = FNil
+  vmap f (FCons x) = FCons (fmap (vmap' f) x)
+
+  vmap' : ∀ {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} {n} → (f : A → B) → A × FVec C A n → B × FVec C B n
+  vmap' f (a , v) = f a , vmap f v
 
 mutual
   take : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} → (n : ℕ) → FStream C A → FVec C A n
@@ -150,7 +157,7 @@ mutual
 ⟨_▻⋯ : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} {A : Set ℓ₂} {n : ℕ}
      → FVec C A (suc n) → FStream {i} C A
 ⟨ as ▻⋯ = FNil pre⟨ as ▻⋯
-  where
+
 
 
 {-
