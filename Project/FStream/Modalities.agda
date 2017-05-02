@@ -78,13 +78,22 @@ record GA' {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' {
     laterA' : {j : Size< i} → A (fmap GA' (inF (tail props)))
 open GA' public
 
---TODO-Seb: GE'
+{-# NO_POSITIVITY_CHECK #-}
+record GE' {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} (props : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
+  coinductive
+  field
+    nowE' : head props
+    laterE' : {j : Size< i} → E (fmap GE' (inF (tail props)))
+open GE' public
+
+{-
 record GE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   coinductive
   field
     nowE : E (fmap head (inF cas))
     laterE : EPred (GE) (fmap {C = C} (λ as → tail as) (inF cas))
 open GE public
+-}
 
 -- TODO From a CTL viewpoint, it makes much more sense that the modalities act on FStream',
 -- since in the semantics, the first world is already given
@@ -118,6 +127,10 @@ GA : ∀ {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Se
 GA props = APred GA' (inF props)
 
 -- GA' ∘ initA
+
+GE : ∀ {i : Size} {ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → Set (ℓ₁ ⊔ ℓ₂)
+GE props = EPred GE' (inF props)
+
 
 {-
 ■A2 : {C : Container Level.zero} → (cas : FStream C Set) → Set
