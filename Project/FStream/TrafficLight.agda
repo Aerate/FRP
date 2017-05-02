@@ -129,8 +129,39 @@ nowA' (laterA' (isGreenOrRed p) p₁) = inj₂ refl
 laterA' (laterA' (isGreenOrRed p) p₁) p₂ = isGreenOrRed p
 
 
+trafficLight₄ : ∀ {i} → FStream {i} (ReaderC Bool) Bool
+trafficLight₄ = ⟨ returnReader true ▻ read ⟩ ▻⋯
+
+responsivity : ∀ {i} → GE {i} (map (true ≡_) (trafficLight₄))
+proj₁ responsivity = false
+nowE' (proj₂ responsivity) = refl
+proj₁ (laterE' (proj₂ responsivity)) = true
+nowE' (proj₂ (laterE' (proj₂ responsivity))) = refl
+laterE' (proj₂ (laterE' (proj₂ responsivity))) = responsivity
+
+responsivity₁ : ∀ {i} → GE {i} (map (true ≡_) (trafficLight₄))
+responsivity₁ = ⟨ {! _⟩GE  !} ▻GE
+
+responsivity₂ : ∀ {i} → GE {i} (⟨ vmap (true ≡_) (returnReader true ▻ read ⟩) ▻⋯)
+proj₁ responsivity₂ = false
+nowE' (proj₂ responsivity₂) = refl
+proj₁ (laterE' (proj₂ responsivity₂)) = true
+nowE' (proj₂ (laterE' (proj₂ responsivity₂))) = refl
+laterE' (proj₂ (laterE' (proj₂ responsivity₂))) = responsivity₂
 
 
+tautology₄ : GE ⟨ returnReader ⊤ ⟩ ▻⋯
+tautology₄ = ⟨ ConsGE (23 , tt , []GE) ▻GE
+
+tautology₅ : GE ⟨ returnReader ⊤ ⟩ ▻⋯
+tautology₅ = ⟨ (23 , tt) ⟩GE ▻GE
+
+tautology₆ : GE ⟨ returnReader ⊤ ▻ returnReader ⊤ ⟩ ▻⋯
+tautology₆ = ⟨ (23 , tt) ▻GE (42 , tt) ⟩GE ▻GE
+
+-- In lots of cases, Agda can infer the input that will validate the proof
+easy : GE ⟨ (true ≡_) <$> read ▻ returnReader ⊤ ⟩ ▻⋯
+easy = ⟨ refl ▻GEᵢ tt ⟩GEᵢ ▻GE
 
 
 
