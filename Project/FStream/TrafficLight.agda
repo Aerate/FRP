@@ -99,7 +99,8 @@ nowA' tautology₂ p = tt
 laterA' tautology₂ p = tautology₂
 -}
 tautology₃ : GA ⟨ returnReader ⊤ ⟩ ▻⋯
-tautology₃ = ⟨ {!   !} ▻GA
+tautology₃ = ⟨ ConsGA (λ p → tt , []GA) ▻GA
+
 
 -- TODO Find something that this satisfies
 identity : ∀ {A} → FStream (ReaderC A) A
