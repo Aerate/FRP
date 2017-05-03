@@ -33,13 +33,15 @@ data proofGA {ℓ₁ ℓ₂} {C : Container ℓ₁} : {n : ℕ} → (props : FVe
 
 
 
+{-
 mapGA : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {f : A → Set ℓ₃} {m n} → (v : FVec C A m) → (v' : FVec C A (suc n)) → GA {i} ((vmap f v pre⟨ vmap f v' ▻⋯)) → GA {i} (map f (v pre⟨ v' ▻⋯))
-nowA' (mapGA FNil (FCons x) proof p) = {!   !} -- nowA' (proof p)
-nowA' (mapGA (FCons x) v proof p) = {!   !} -- nowA' (proof p)
-laterA' (mapGA FNil (FCons (shape , v)) proof p) p₁ = mapGA {!   !} (FCons (shape , v)) ? ?
+nowA' (mapGA FNil (FCons x) proofs p) = nowA' (proofs p)
+nowA' (mapGA (FCons x) v proofs p) = nowA' (proofs p)
+laterA' (mapGA FNil (FCons (shape , vals)) proofs p) p₁ with vals p
+... | a , v = mapGA v (FCons (shape , vals)) (laterA' (subst (λ x → {!   !}) refl (proofs p))) p₁
 -- laterA' (mapGA FNil v' proof p) p₁ = mapGA ({!   !}) (FCons {!   !}) (λ p₂ → laterA' (proof {!   !}) {!   !}) {!   !}
-laterA' (mapGA (FCons x) v' proof p) p₁ = {!   !}
-
+laterA' (mapGA (FCons x) v' proofs p) p₁ = {!   !}
+-}
 
 {-
 mapGA : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set (lsuc ℓ₃)} {f : A → Set ℓ₃} {m n} → {v : FVec C A m} → {v' : FVec C A (suc n)} → GA {i} ((vmap f v pre⟨ vmap f v' ▻⋯)) → GA {i} (map f (v pre⟨ v' ▻⋯))
@@ -53,6 +55,17 @@ laterA' ( ([]GA pre⟨ (ConsGA proofs) ▻GA) p) p₁ = (proj₂ (proofs p) pre�
 nowA' ( ((ConsGA proofs) pre⟨ _ ▻GA) p) = proj₁ (proofs p)
 laterA' ( ((ConsGA proofs) pre⟨ proofs' ▻GA) p) p₁ = (proj₂ (proofs p) pre⟨ proofs' ▻GA) p₁
 -- The p are the inputs (positions) from the side effects.
+
+mapprecycle : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {f : A → Set ℓ₃} {m n} (v : FVec C A m) → (v' : FVec C A (suc n)) → proofGA (vmap f v) → proofGA (vmap f v') → GA {i} (map f (v pre⟨ v' ▻⋯))
+nowA' (mapprecycle FNil (FCons x) []GA (ConsGA proofs) p) with proofs p
+...                                                          | proof , proofs' = proof
+laterA' (mapprecycle FNil (FCons (shape , vals)) []GA (ConsGA proofs) p) p' with proofs p
+... | proof , proofs' with vals p
+...                    | a , v = mapprecycle v (FCons (shape , vals)) proofs' (ConsGA proofs) p'
+nowA' (mapprecycle (FCons x) v' (ConsGA proofs) proofs' p) = proj₁ (proofs p)
+laterA' (mapprecycle (FCons (shape , vals)) (FCons x) (ConsGA proofs) proofs' p) p₁ with proofs p
+... | proof , proofs'' with vals p
+...                       | a , v = mapprecycle v (FCons x) proofs'' proofs' p₁
 
 ⟨_▻GA : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {n} {props : FVec C (Set ℓ₂) (suc n)} → proofGA props → GA {i} (FNil pre⟨ props ▻⋯)
 ⟨_▻GA = []GA pre⟨_▻GA
