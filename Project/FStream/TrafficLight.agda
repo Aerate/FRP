@@ -132,15 +132,15 @@ laterA' (laterA' (isGreenOrRed p) p₁) p₂ = isGreenOrRed p
 trafficLight₄ : ∀ {i} → FStream {i} (ReaderC Bool) Bool
 trafficLight₄ = ⟨ returnReader true ▻ read ⟩ ▻⋯
 
-responsivity : ∀ {i} → GE {i} (map (true ≡_) (trafficLight₄))
+responsivity : ∀ {i} → GE {i} (map (true ≡_) trafficLight₄)
 proj₁ responsivity = false
 nowE' (proj₂ responsivity) = refl
 proj₁ (laterE' (proj₂ responsivity)) = true
 nowE' (proj₂ (laterE' (proj₂ responsivity))) = refl
 laterE' (proj₂ (laterE' (proj₂ responsivity))) = responsivity
 
-responsivity₁ : ∀ {i} → GE {i} (map (true ≡_) (trafficLight₄))
-responsivity₁ = ⟨ {! _⟩GE  !} ▻GE
+responsivity₁ : ∀ {i} → GE {i} (map (true ≡_) trafficLight₄)
+responsivity₁ = mapGE₁ ⟨ refl ⟩GEᵢ ▻GE
 
 responsivity₂ : ∀ {i} → GE {i} (⟨ vmap (true ≡_) (returnReader true ▻ read ⟩) ▻⋯)
 proj₁ responsivity₂ = false

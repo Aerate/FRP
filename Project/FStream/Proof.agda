@@ -126,6 +126,10 @@ nowE' (proj₂ (mapGE (FCons x) v' (pos , proofs))) = nowE' proofs
 laterE' (proj₂ (mapGE (FCons (shape , vals)) v' (pos , proofs))) with vals pos
 ... | a , v = mapGE v v' (laterE' proofs)
 
+-- TODO Swap names between this one and the previous, since this one is the one that's actually being used
+mapGE₁ : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {f : A → Set ℓ₃} {m n} → {v : FVec C A m} → {v' : FVec C A (suc n)} → GE {i} ((vmap f v pre⟨ vmap f v' ▻⋯)) → GE {i} (map f (v pre⟨ v' ▻⋯))
+mapGE₁ {v = v} {v' = v'} proofs = mapGE v v' proofs
+
 
 {-
 bisimGE : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {s₁ s₂ : FStream' C (Set ℓ₂)} → s₁ ∼E s₂ → GE' {i} s₁ → GE' {i} s₂
