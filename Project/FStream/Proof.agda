@@ -114,16 +114,20 @@ _▻GE_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {prop : ⟦ C ⟧ (Set ℓ�
 _▻GEᵢ_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {prop : ⟦ C ⟧ (Set ℓ₂)} {n} {props : FVec C (Set ℓ₂) n} → {pos : Position C (proj₁ prop)} → proj₂ prop pos → proofGE props → proofGE (FCons (fmap (_, props) prop))
 _▻GEᵢ_ {pos = pos} proof proofs = ConsGE (pos , (proof , proofs))
 
-{-
+
 
 mapGE : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {f : A → Set ℓ₃} {m n} → (v : FVec C A m) → (v' : FVec C A (suc n)) → GE {i} ((vmap f v pre⟨ vmap f v' ▻⋯)) → GE {i} (map f (v pre⟨ v' ▻⋯))
 proj₁ (mapGE FNil (FCons x) (pos , proof)) = pos
-nowE' (proj₂ (mapGE FNil (FCons x) (pos , proof))) = {!   !}
-laterE' (proj₂ (mapGE {f = f} FNil (FCons (proj₃ , proj₄)) (pos , proof))) = mapGE {! FCons ?  !} {!   !} {!   !}
-proj₁ (mapGE (FCons (proj₃ , proj₄)) v' (proj₅ , proj₆)) = {!   !}
-nowE' (proj₂ (mapGE (FCons x) v' (proj₃ , proj₄))) = {!   !}
-laterE' (proj₂ (mapGE (FCons x) v' (proj₃ , proj₄))) = mapGE {!   !} {!   !} {!   !}
+nowE' (proj₂ (mapGE FNil (FCons x) (pos , proofs))) = nowE' proofs
+laterE' (proj₂ (mapGE {f = f} FNil (FCons (shape , vals)) (pos , proof))) with vals pos
+... | a , v = mapGE v (FCons (shape , vals)) (laterE' proof)
+proj₁ (mapGE (FCons (proj₃ , proj₄)) v' (pos , proofs)) = pos
+nowE' (proj₂ (mapGE (FCons x) v' (pos , proofs))) = nowE' proofs
+laterE' (proj₂ (mapGE (FCons (shape , vals)) v' (pos , proofs))) with vals pos
+... | a , v = mapGE v v' (laterE' proofs)
 
+
+{-
 bisimGE : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {s₁ s₂ : FStream' C (Set ℓ₂)} → s₁ ∼E s₂ → GE' {i} s₁ → GE' {i} s₂
 nowE' (bisimGE bisim proof) = subst (λ x → x) (hd∼E bisim) (nowE' proof) -- TODO This thing is called differently
 laterE' (bisimGE {C = C} bisim proof) = {!   !}
