@@ -1,5 +1,0 @@
-Cleaning up (Modularity, indentation)
-GA -> AG
-Until
-Next
-semantics
