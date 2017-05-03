@@ -142,6 +142,9 @@ laterE' (proj₂ (laterE' (proj₂ responsivity))) = responsivity
 responsivity₁ : ∀ {i} → GE {i} (map (true ≡_) trafficLight₄)
 responsivity₁ = mapGE₁ ⟨ refl ⟩GEᵢ ▻GE
 
+responsivity₁' : ∀ {i} → GE {i} (map (true ≡_) trafficLight₄)
+responsivity₁' = mapGE₁ ⟨ refl ▻GEᵢ refl ⟩GEᵢ ▻GE
+
 responsivity₂ : ∀ {i} → GE {i} (⟨ vmap (true ≡_) (returnReader true ▻ read ⟩) ▻⋯)
 proj₁ responsivity₂ = false
 nowE' (proj₂ responsivity₂) = refl
