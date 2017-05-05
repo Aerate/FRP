@@ -141,6 +141,15 @@ proj₁ (laterE' (bisimGE {C = C} bisim proof) {j}) = {!   !} -- subst (Position
 proj₂ (laterE' (bisimGE {C = C} bisim proof)) = {!   !} -- subst {! Position C  !} (sameShapesE bisim) (proj₂ (laterE' proof))
 -}
 
+bisimGE : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {s₁ s₂ : FStream' C (Set ℓ₂)} → s₁ ∼ s₂ → GE' {i} s₁ → GE' {i} s₂
+nowE' (bisimGE bisim proof) = subst (λ x → x) (hd∼ bisim) (nowE' proof)
+proj₁ (laterE' (bisimGE {C = C} bisim proof))
+  with laterE' proof
+...  | pos , proofs = subst (Position C) (sameShapes bisim) pos
+proj₂ (laterE' (bisimGE bisim proof))
+  with laterE' proof
+...  | pos , proofs  = bisimGE (tl∼ bisim pos) proofs
+
 
 
 
