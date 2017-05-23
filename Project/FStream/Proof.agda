@@ -96,7 +96,7 @@ infixr 5 _▻GEᵢ_
 infix 7 _⟩GEᵢ
 
 
-
+-- TODO Rename to ⟨_▻GE⋯ ?
 ⟨_▻GE : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {n} {props : FVec C (Set ℓ₂) (suc n)} → proofGE props → GE {i} (FNil pre⟨ props ▻⋯)
 ⟨_▻GE = []GE pre⟨_▻GE
 

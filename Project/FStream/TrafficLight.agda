@@ -49,7 +49,9 @@ trafficLight₃ = ⟨ returnReader green ▻ (boolToColour <$> read) ▻ returnR
 boolLight₃ : FStream (ReaderC Bool) Bool
 boolLight₃ = ⟨ returnReader true ▻ returnReader false ▻ returnReader true ⟩ ▻⋯
 
--- TODO: Check FAₛ implementation since only the 'AlreadyA'-Constructor seems to work
+
+-- TODO This is just a size issue!
+-- TODO Try with the framework
 isLive₃ : ∀ {i} → head (GAₛ' {i} (FAₛ' {i} (initA {i} (map (_≡ green) (trafficLight₃ {i})))))
 nowA' isLive₃ = alreadyA' (λ p → refl)
 nowA' (laterA' (isLive₃ {i}) {j} p) = {!   !}
@@ -119,9 +121,10 @@ nowA' (laterA' isAlwaysGreen _) _ = refl
 laterA' (laterA' isAlwaysGreen _) _ = isAlwaysGreen
 -}
 
+{-
 isAlwaysGreen' : ∀ {i} → GA {i} (map (_≡ green) alwaysGreen)
 isAlwaysGreen' = {! cycleGA ?  !}
-
+-}
 
 isGreenOrRed : ∀ {i} → GA {i} (map (λ x → (x ≡ green) ⊎ (x ≡ red)) ⟨ returnReader green ▻ returnReader red ⟩ ▻⋯)
 nowA' (isGreenOrRed p) = inj₁ refl
