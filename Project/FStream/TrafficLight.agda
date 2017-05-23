@@ -25,7 +25,11 @@ boolToColour false = green
 boolToColour true = red
 
 trafficLight : FStream (ReaderC Bool) Colour
+<<<<<<< HEAD
 trafficLight = ⟨ returnReader green ▻ (boolToColour <$> ask) ▻ returnReader green ▻ returnReader red ⟩ ▻⋯
+=======
+trafficLight = ⟨ returnReader green ▻ (boolToColour <$> read) ▻ returnReader green ▻ returnReader red ⟩ ▻⋯
+>>>>>>> feature_stream_of_proofs
 -- TODO Consider replacing Colour by Bool for simplification
 
 boolLight : FStream (ReaderC Bool) Bool
@@ -37,7 +41,11 @@ isLive = alreadyA (λ p → refl)
 
 
 trafficLight₂ : FStream (ReaderC Bool) Colour
+<<<<<<< HEAD
 trafficLight₂ = ⟨ returnReader red ▻ (boolToColour <$> ask) ▻ returnReader red ▻ returnReader green ⟩ ▻⋯
+=======
+trafficLight₂ = ⟨ returnReader red ▻ (boolToColour <$> read) ▻ returnReader red ▻ returnReader green ⟩ ▻⋯
+>>>>>>> feature_stream_of_proofs
 boolLight₂ : FStream (ReaderC Bool) Bool
 boolLight₂ = ⟨ returnReader false ▻ returnReader false ▻ returnReader true ⟩ ▻⋯
 
@@ -51,7 +59,8 @@ trafficLight₃ = ⟨ returnReader green ▻ (boolToColour <$> ask) ▻ returnRe
 boolLight₃ : FStream (ReaderC Bool) Bool
 boolLight₃ = ⟨ returnReader true ▻ returnReader false ▻ returnReader true ⟩ ▻⋯
 
--- TODO: Check FAₛ implementation since only the 'AlreadyA'-Constructor seems to work
+-- TODO This is just a size issue!
+-- TODO Try with the framework
 isLive₃ : ∀ {i} → head (AGₛ' {i} (AFₛ' {i} (initA {i} (map (_≡ green) (trafficLight₃ {i})))))
 nowA' isLive₃ = alreadyA' (λ p → refl)
 nowA' (laterA' (isLive₃ {i}) {j} p) = {!   !}
@@ -122,7 +131,7 @@ laterA' (laterA' isAlwaysGreen _) _ = isAlwaysGreen
 -}
 
 isAlwaysGreen' : ∀ {i} → AG {i} (map (_≡ green) alwaysGreen)
-isAlwaysGreen' = {! cycleGA ?  !}
+isAlwaysGreen' = {! cycleAG ?  !}
 
 
 isGreenOrRed : ∀ {i} → AG {i} (map (λ x → (x ≡ green) ⊎ (x ≡ red)) ⟨ returnReader green ▻ returnReader red ⟩ ▻⋯)
@@ -167,3 +176,11 @@ tautology₆ = ⟨ (23 , tt) ▻EG (42 , tt) ⟩EG ▻EG
 -- In lots of cases, Agda can infer the input that will validate the proof
 easy : EG ⟨ (true ≡_) <$> ask ▻ returnReader ⊤ ⟩ ▻⋯
 easy = ⟨ refl ▻EG₁ tt ⟩EG₁ ▻EG
+
+
+
+
+
+
+
+--

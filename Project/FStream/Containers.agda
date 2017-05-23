@@ -4,7 +4,7 @@ module FStream.Containers where
 -- Containers & their extension
 ------------------------------------------------------------------------
 
-open import Data.Fin 
+open import Data.Fin
 open import Data.Unit
 
 open import Library

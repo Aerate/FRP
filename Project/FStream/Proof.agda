@@ -3,8 +3,9 @@ module FStream.Proof where
 open import Relation.Binary.PropositionalEquality
 
 open import Library
-open import FStream.FVec
+open import FStream.Bisimulation
 open import FStream.Core
+open import FStream.FVec
 open import FStream.Modalities
 
 data proofAG' {ℓ₁ ℓ₂} {C : Container ℓ₁} : {n : ℕ} → (props : FVec' C (Set ℓ₂) n) → Set (ℓ₁ ⊔ ℓ₂) where
@@ -80,6 +81,7 @@ proj₁ (ConsEG (pos , _) pre⟨ _ ▻EG) = pos
 nowE'   (proj₂ (ConsEG (pos , proof , proofs) pre⟨ _ ▻EG)) = proof
 laterE' (proj₂ (ConsEG (_   , _     , proofs) pre⟨ v ▻EG)) = proofs pre⟨ v ▻EG
 
+
 -- TODO It's worth a thought whether we want to roll our own Sigma types
 -- in order to have more meaningful projector names than projᵢ
 
@@ -90,8 +92,7 @@ infix 7 _⟩EG
 infixr 5 _▻EG₁_
 infix 7 _⟩EG₁
 
-
-
+-- TODO Rename to ⟨_▻EG⋯?
 ⟨_▻EG : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {n} {props : FVec C (Set ℓ₂) (suc n)} → proofEG props → EG {i} (FNil pre⟨ props ▻⋯)
 ⟨_▻EG = []EG pre⟨_▻EG
 
@@ -102,7 +103,6 @@ _⟩EG₁ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {prop : ⟦ C ⟧ (Set �
 _⟩EG₁ {pos = pos} proof = ConsEG (pos , (proof , []EG))
 
 
--- TODO
 _▻EG_ : ∀ {ℓ₁ ℓ₂} {C : Container ℓ₁} {prop : ⟦ C ⟧ (Set ℓ₂)} {n} {props : FVec C (Set ℓ₂) n} → E prop → proofEG props → proofEG (FCons (fmap (_, props) prop))
 (pos , proof) ▻EG proofs = ConsEG (pos , (proof , proofs))
 
@@ -122,20 +122,21 @@ laterE' (proj₂ (mapEG₁ (FCons (shape , vals)) v' (pos , proofs))) with vals 
 mapEG : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {f : A → Set ℓ₃} {m n} → {v : FVec C A m} → {v' : FVec C A (suc n)} → EG {i} ((vmap f v pre⟨ vmap f v' ▻⋯)) → EG {i} (map f (v pre⟨ v' ▻⋯))
 mapEG {v = v} {v' = v'} proofs = mapEG₁ v v' proofs
 
+bisimEG : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {s₁ s₂ : FStream' C (Set ℓ₂)} → s₁ ∼ s₂ → EG' {i} s₁ → EG' {i} s₂
+nowE' (bisimEG bisim proof) = subst (λ x → x) (hd∼ bisim) (nowE' proof)
+proj₁ (laterE' (bisimEG {C = C} bisim proof))
+  with laterE' proof
+...  | pos , proofs = subst (Position C) (sameShapes bisim) pos
+proj₂ (laterE' (bisimEG bisim proof))
+  with laterE' proof
+...  | pos , proofs  = bisimEG (tl∼ bisim pos) proofs
 
-{-
-bisimEG : ∀ {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} {s₁ s₂ : FStream' C (Set ℓ₂)} → s₁ ∼E s₂ → EG' {i} s₁ → EG' {i} s₂
-nowE' (bisimEG bisim proof) = subst (λ x → x) (hd∼E bisim) (nowE' proof) -- TODO This thing is called differently
-laterE' (bisimEG {C = C} bisim proof) = {!   !}
--}
-{-
-proj₁ (laterE' (bisimEG {C = C} bisim proof) {j}) = {!   !} -- subst (Position C) (sameShapesE bisim) (proj₁ (laterE' proof))
-proj₂ (laterE' (bisimEG {C = C} bisim proof)) = {!   !} -- subst {! Position C  !} (sameShapesE bisim) (proj₂ (laterE' proof))
--}
-
-
-
-
+map∼ : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} {f : A → B} {m n} → (v : FVec C A m) → (v' : FVec C A (suc n)) → ((vmap f v pre⟨ vmap f v' ▻⋯)) ∼' (map f (v pre⟨ v' ▻⋯))
+sameInitShapes (map∼ FNil (FCons x)) = refl
+sameInitShapes (map∼ (FCons x) v') = refl
+hd∼ (bisim (map∼ v (FCons x)) pos) = {!   !}
+sameShapes (bisim (map∼ v (FCons x)) pos) = {!   !}
+tl∼ (bisim (map∼ v (FCons x)) pos) = {!   !}
 
 
 

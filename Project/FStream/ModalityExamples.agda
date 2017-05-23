@@ -55,7 +55,7 @@ eventuallysometimes>2 = alreadyE (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (
 
 -- Es ist jederzeit möglich, dass die Summe 2 übersteigt
 alwaysSomehow>2 : ∀ {i} → GE {i} (map (_> 2) sum)
-alwaysSomehow>2 = {!   !}
+alwaysSomehow>2 = ?
 {-proj₁ alwaysSomehow>2 = suc (suc (suc zero))
 nowE' (proj₂ alwaysSomehow>2) = s≤s (s≤s (s≤s z≤n))
 proj₁ (laterE' (proj₂ alwaysSomehow>2)) = zero

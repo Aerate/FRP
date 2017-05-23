@@ -29,6 +29,8 @@ inF (tail (EFₛ' x)) = fmap EFₛ' (inF (tail x))
 -- head (GAₛ' cas) = GA cas
 -- inF (tail (GAₛ' cas)) = fmap (GAₛ' ∘ (λ as → tail as)) (inF cas)
 
+
+-- TODO The following is a crazy idea
 {-
 mutual
   FAₛ' : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
