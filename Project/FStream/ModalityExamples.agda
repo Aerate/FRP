@@ -30,9 +30,10 @@ sometimes5 = ℕ.suc (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero))) , refl
 
 -- Jederzeit ist die Ausgabe von constantly readSuc positiv, egal welche Werte reinkommen
 always>0 : GA (map (_> 0) (constantly readSuc))
-nowA always>0 = λ p → s≤s z≤n
+always>0 = {!   !}
+{-nowA always>0 = λ p → s≤s z≤n
 laterA always>0 = λ p → always>0
-
+-}
 {-
 nowA always>0 p = s≤s z≤n
 laterA always>0 p = always>0
@@ -53,10 +54,20 @@ eventuallysometimes>2 = alreadyE (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (
 
 
 -- Es ist jederzeit möglich, dass die Summe 2 übersteigt
-alwaysSomehow>2 : GE (map (_> 2) sum)
-nowE alwaysSomehow>2 = ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n))
-laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
+alwaysSomehow>2 : ∀ {i} → GE {i} (map (_> 2) sum)
+alwaysSomehow>2 = ?
+{-proj₁ alwaysSomehow>2 = suc (suc (suc zero))
+nowE' (proj₂ alwaysSomehow>2) = s≤s (s≤s (s≤s z≤n))
+proj₁ (laterE' (proj₂ alwaysSomehow>2)) = zero
+proj₂ (laterE' (proj₂ alwaysSomehow>2)) = {!   !}
+-}
 {-
 nowE alwaysSomehow>2 = (ℕ.suc (ℕ.suc (ℕ.suc ℕ.zero)) , s≤s (s≤s (s≤s z≤n)))
 laterE alwaysSomehow>2 = ℕ.zero , alwaysSomehow>2
 -}
+
+
+
+
+
+--
