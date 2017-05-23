@@ -150,8 +150,12 @@ proj₂ (laterE' (bisimGE bisim proof))
   with laterE' proof
 ...  | pos , proofs  = bisimGE (tl∼ bisim pos) proofs
 
-
-
+map∼ : ∀ {i} {ℓ₁ ℓ₂ ℓ₃} {C : Container ℓ₁} {A : Set ℓ₂} {B : Set ℓ₃} {f : A → B} {m n} → (v : FVec C A m) → (v' : FVec C A (suc n)) → ((vmap f v pre⟨ vmap f v' ▻⋯)) ∼' (map f (v pre⟨ v' ▻⋯))
+sameInitShapes (map∼ FNil (FCons x)) = refl
+sameInitShapes (map∼ (FCons x) v') = refl
+hd∼ (bisim (map∼ v (FCons x)) pos) = {!   !}
+sameShapes (bisim (map∼ v (FCons x)) pos) = {!   !}
+tl∼ (bisim (map∼ v (FCons x)) pos) = {!   !}
 
 
 
