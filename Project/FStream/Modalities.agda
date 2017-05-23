@@ -100,23 +100,23 @@ open GE public
 data FA {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA : A (fmap head (inF cas)) → FA cas
   notYetA : APred FA (fmap (λ x → tail x) (inF cas)) → FA cas
-open FA
+open FA public
 
 data FA' {i} {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyA' : head cas → FA' cas
   notYetA' :  {j : Size< i} →  A (fmap FA' (inF (tail cas))) → FA' cas
-open FA'
+open FA' public
 
 
 data FE' {ℓ₁ ℓ₂} {i : Size} {C : Container ℓ₁} (cas : FStream' {i} C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyE : head cas → FE' cas
   notYetE :  {j : Size< i} →  E (fmap FE' (inF (tail cas))) → FE' cas
-open FE'
+open FE' public
 
 data FE {ℓ₁ ℓ₂} {C : Container ℓ₁} (cas : FStream C (Set ℓ₂)) : Set (ℓ₁ ⊔ ℓ₂) where
   alreadyE : E (fmap head (inF cas)) → FE cas
   notYetE : EPred FE (fmap (λ x → tail x) (inF cas)) → FE cas
-open FE
+open FE public
 
 
 initA : ∀ {i ℓ₁ ℓ₂} {C : Container ℓ₁} → FStream {i} C (Set ℓ₂) → FStream' {i} C (Set (ℓ₁ ⊔ ℓ₂))
